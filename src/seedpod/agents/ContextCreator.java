@@ -74,12 +74,15 @@ public class ContextCreator implements ContextBuilder<Object> {
 //		for(int i=0;i<mannedACCount;i++) {
 //			mannedAdder.add(airspaceGeography, new MannedAircraftAgent());
 //		}
+		System.out.println(hospitals);
 		
 		int uavCount = 5;
 		airspaceGeography.setAdder(new UAVAdder(hospitals));
 		Adder uavAdder = airspaceGeography.getAdder();
 		for(int i=0;i<uavCount;i++) {
-			uavAdder.add(airspaceGeography, new UAVAgent());
+			UAVAgent agent = new UAVAgent();
+			context.add(agent);
+			uavAdder.add(airspaceGeography, agent);
 		}
 		
 		return context;

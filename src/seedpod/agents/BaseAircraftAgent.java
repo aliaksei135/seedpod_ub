@@ -1,5 +1,6 @@
 package seedpod.agents;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ public abstract class BaseAircraftAgent {
 	protected int pathIndex = 0;
 	
 	protected boolean airborne = false;
-	protected boolean onPath = true;
+	protected boolean onPath;
 	protected int speedMPS;
 	
 	protected Context context;
@@ -29,6 +30,7 @@ public abstract class BaseAircraftAgent {
 	
 	public BaseAircraftAgent() {
 		this.pathCoords = new ArrayList<>(10);
+		onPath = false;
 	}
 	
 //	@ScheduledMethod(start = 1)
@@ -41,11 +43,12 @@ public abstract class BaseAircraftAgent {
 	@ScheduledMethod(start = 1, interval = 1)
 	public void fly() {
 		System.out.println("Flying");
-		//Replan path if not on it
-		if(!onPath) findPath();
 		
 		this.context = ContextUtils.getContext(this);
 		this.geography = (Geography)context.getProjection("airspace_geo");
+		
+		//Replan path if not on it
+		if(!onPath) findPath();
 		
 		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
 		Coordinate nextPoint = this.pathCoords.get(this.pathIndex);
@@ -55,6 +58,12 @@ public abstract class BaseAircraftAgent {
 		double dy = nextPoint.y - currentPos.y;
 		double dx = Math.cos(Math.PI/180*currentPos.y)*(nextPoint.x-currentPos.x);
 		double angleRad = Math.atan2(dy, dx);
+		if(angleRad < 0) {
+			angleRad = angleRad + 2*Math.PI;
+		}
+		System.out.println(dy);
+		System.out.println(dx);
+		System.out.println(angleRad);
 		
 		this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, angleRad);
 		this.pathIndex++;
