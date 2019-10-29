@@ -22,7 +22,8 @@ public abstract class BaseAircraftAgent {
 	protected int pathIndex = 0;
 	
 	protected boolean airborne = false;
-	protected boolean onPath;
+	private boolean nextPointDestination = false;
+	private boolean onPath = false;
 	protected int speedMPS;
 	
 	protected Context context;
@@ -30,7 +31,6 @@ public abstract class BaseAircraftAgent {
 	
 	public BaseAircraftAgent() {
 		this.pathCoords = new ArrayList<>(10);
-		onPath = false;
 	}
 	
 //	@ScheduledMethod(start = 1)
@@ -57,16 +57,22 @@ public abstract class BaseAircraftAgent {
 		//which are both true of solent region
 		double dy = nextPoint.y - currentPos.y;
 		double dx = Math.cos(Math.PI/180*currentPos.y)*(nextPoint.x-currentPos.x);
+		double dist = Math.sqrt(dy*dy + dx*dx);
 		double angleRad = Math.atan2(dy, dx);
 		if(angleRad < 0) {
 			angleRad = angleRad + 2*Math.PI;
 		}
-		System.out.println(dy);
-		System.out.println(dx);
-		System.out.println(angleRad);
+		
+		if(dist < DESTINATION_BOUNDARY) {
+			if(this.pathCoords.size()-1 == this.pathIndex) {
+				//Check if at final destination, if so destroy agent
+				destroy();
+			} else {
+				this.pathIndex++;
+			}
+		}
 		
 		this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, angleRad);
-		this.pathIndex++;
 		
 		airborne = true;
 	}
@@ -100,6 +106,11 @@ public abstract class BaseAircraftAgent {
 		this.pathCoords.add(this.destination);
 		// Reset index for new path
 		this.pathIndex = 0;
+		this.onPath = true;
+	}
+	
+	public void destroy() {
+		this.context.remove(this);
 	}
 
 
