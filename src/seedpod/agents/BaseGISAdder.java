@@ -8,7 +8,6 @@ public class BaseGISAdder implements GISAdder<Object> {
 	@Override
 	public void add(Geography<Object> destination, Object object) {
 		
-		
 	}
 
 }

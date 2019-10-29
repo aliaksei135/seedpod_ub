@@ -9,15 +9,15 @@ import com.vividsolutions.jts.geom.Geometry;
 import repast.simphony.space.gis.FeatureAgent;
 import repast.simphony.space.gis.Geography;
 
-public class BaseGroundAgent extends FeatureAgent{
+public class BaseGroundAgent{
 	
-	public BaseGroundAgent(SimpleFeatureType type, Object agent, Geography geog, List adapters,
-			List classAttributeList) {
-		super(type, agent, geog, adapters, classAttributeList);
-	}
 	public String id;
 	public String readableName;
 	public Geometry geometry;
+	
+	public BaseGroundAgent() {
+		
+	}
 	
 	public String getId() {
 		return id;

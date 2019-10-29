@@ -16,7 +16,7 @@ import static seedpod.constants.Constants.*;
 
 public abstract class BaseAircraftAgent {
 	
-	protected Geometry destination;
+	protected Coordinate destination;
 	protected ArrayList<Coordinate> pathCoords;
 	protected int pathIndex = 0;
 	
@@ -27,18 +27,25 @@ public abstract class BaseAircraftAgent {
 	protected Context context;
 	protected Geography geography;
 	
-	public BaseAircraftAgent(Geometry destination) {
-		this.destination = destination;
+	public BaseAircraftAgent() {
 		this.pathCoords = new ArrayList<>(10);
-		this.context = ContextUtils.getContext(this);
-		this.geography = (Geography)context.getProjection("airspace_geo");
 	}
+	
+//	@ScheduledMethod(start = 1)
+//	public void setup() {
+//		this.context = ContextUtils.getContext(this);
+//		this.geography = (Geography)context.getProjection("airspace_geo");
+//	}
 
 
 	@ScheduledMethod(start = 1, interval = 1)
 	public void fly() {
+		System.out.println("Flying");
 		//Replan path if not on it
 		if(!onPath) findPath();
+		
+		this.context = ContextUtils.getContext(this);
+		this.geography = (Geography)context.getProjection("airspace_geo");
 		
 		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
 		Coordinate nextPoint = this.pathCoords.get(this.pathIndex);
@@ -68,8 +75,8 @@ public abstract class BaseAircraftAgent {
 //	}
 	
 	public void findPath() {
+		System.out.println("Planning path");
 		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
-		Coordinate destinationPos = this.destination.getCoordinate();
 		
 		Iterator objIterator = geography.getAllObjects().iterator();
 		List<Object> obstaclesList = new ArrayList<>();
@@ -81,8 +88,18 @@ public abstract class BaseAircraftAgent {
 		}
 		
 		//TODO find path around obstacles defined by points
-		this.pathCoords.add(destinationPos);
+		this.pathCoords.add(this.destination);
 		// Reset index for new path
 		this.pathIndex = 0;
+	}
+
+
+	public Coordinate getDestination() {
+		return destination;
+	}
+
+
+	public void setDestination(Coordinate destination) {
+		this.destination = destination;
 	}
 }

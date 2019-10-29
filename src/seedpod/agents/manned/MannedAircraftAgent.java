@@ -15,15 +15,15 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 	private static final int SEP_DIST_M = 5500; //About 3nm
 
 
-	public MannedAircraftAgent(Geometry destination) {
-		super(destination);
+	public MannedAircraftAgent() {
+		super();
 		speedMPS = 100; //About 200kts
 	}
 
-	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
-			watcheeFieldNames = "airborne", //Ignore if not airborne
-			query = "within " + SEP_DIST_M,
-			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE)
+//	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
+//			watcheeFieldNames = "airborne", //Ignore if not airborne
+//			query = "within " + SEP_DIST_M,
+//			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE)
 	@Override
 	public void onBufferInfringed() {
 		super.onBufferInfringed();

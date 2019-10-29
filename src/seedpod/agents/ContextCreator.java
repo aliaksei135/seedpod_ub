@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,11 +29,17 @@ import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.gis.util.GeometryUtil;
 import repast.simphony.random.RandomHelper;
+import repast.simphony.relogo.ide.dynamics.NetLogoSystemDynamicsParser.intg_return;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
+import repast.simphony.space.projection.Adder;
 import seedpod.agents.ground.AerodromeAgent;
 import seedpod.agents.ground.BaseGroundAgent;
 import seedpod.agents.ground.HospitalAgent;
+import seedpod.agents.manned.MannedAircraftAdder;
+import seedpod.agents.manned.MannedAircraftAgent;
+import seedpod.agents.unmanned.UAVAdder;
+import seedpod.agents.unmanned.UAVAgent;
 
 public class ContextCreator implements ContextBuilder<Object> {
 	
@@ -42,7 +49,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 
 	@Override
 	public Context build(Context<Object> context) {
-		context.setId("seedpod");
+		context.setId("SEEDPOD");
 		
 		//Create geo projection
 		GeographyParameters<Object> geoParams = new GeographyParameters<Object>();
@@ -58,10 +65,22 @@ public class ContextCreator implements ContextBuilder<Object> {
 		
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
-		loadFeatures(AERODROME_SHAPEFILE, context, airspaceGeography, AerodromeAgent.class);
-		loadFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography, HospitalAgent.class);
+//		List<Geometry> aerodromes = loadFeatures(AERODROME_SHAPEFILE, context, airspaceGeography, AerodromeAgent.class);
+		List<Geometry> hospitals = loadFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography, HospitalAgent.class);
 		
+//		int mannedACCount = 5;
+//		airspaceGeography.setAdder(new MannedAircraftAdder(aerodromes));
+//		Adder mannedAdder = airspaceGeography.getAdder();
+//		for(int i=0;i<mannedACCount;i++) {
+//			mannedAdder.add(airspaceGeography, new MannedAircraftAgent());
+//		}
 		
+		int uavCount = 5;
+		airspaceGeography.setAdder(new UAVAdder(hospitals));
+		Adder uavAdder = airspaceGeography.getAdder();
+		for(int i=0;i<uavCount;i++) {
+			uavAdder.add(airspaceGeography, new UAVAgent());
+		}
 		
 		return context;
 	}
@@ -74,7 +93,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 			e1.printStackTrace();
 		}
 
-		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		List<SimpleFeature> features = new ArrayList<>();
 		
 		// Try to load the shapefile
 		SimpleFeatureIterator fiter = null;
@@ -91,7 +110,9 @@ public class ContextCreator implements ContextBuilder<Object> {
 			e.printStackTrace();
 		}
 		finally{
-			fiter.close();
+			if(fiter != null) {
+				fiter.close();
+			}
 			store.dispose();
 		}
 		
@@ -108,9 +129,11 @@ public class ContextCreator implements ContextBuilder<Object> {
 	 * @param geography the geography
 	 * @param agentClass class of agent to create
 	 */
-	private void loadFeatures (String filename, Context context, Geography geography, Class<? extends BaseGroundAgent> agentClass){
+	private List<Geometry> loadFeatures (String filename, Context context, Geography geography, Class<? extends BaseGroundAgent> agentClass){
 
 		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
+		
+		List<Geometry> geometries = new ArrayList<>();
 		
 		// For each feature in the file
 		for (SimpleFeature feature : features){
@@ -121,14 +144,13 @@ public class ContextCreator implements ContextBuilder<Object> {
 				System.out.println("Invalid geometry: " + feature.getID());
 			}
 			
-			
 			if (geom instanceof MultiPolygon){
 				MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometry();
 				geom = (Polygon)mp.getGeometryN(0);
 
 				// Read the feature attributes
 				String name = (String)feature.getAttribute("name");
-				double taxRate = (double)feature.getAttribute("Tax_Rate");
+				
 
 				try {
 					agent = agentClass.getDeclaredConstructor().newInstance();
@@ -141,31 +163,11 @@ public class ContextCreator implements ContextBuilder<Object> {
 				agent.setId(UUID.randomUUID().toString());
 				agent.setGeometry(geom);
 				if(agent instanceof HospitalAgent) {
-					boolean isEmergency = (boolean)feature.getAttribute("emergency");
+					boolean isEmergency = "yes".equals(((String)feature.getAttribute("emergency")).toLowerCase());
 					((HospitalAgent)agent).setEmergency(isEmergency);
 				}
-				
+				geometries.add(geom);
 			}
-
-//			// For Points, create RadioTower agents
-//			else if (geom instanceof Point){
-//				geom = (Point)feature.getDefaultGeometry();				
-//
-//				// Read the feature attributes and assign to the ZoneAgent
-//				String name = (String)feature.getAttribute("Name");
-//				agent = new RadioTower(name);
-//			}
-//
-//			// For Lines, create WaterLines
-//			else if (geom instanceof MultiLineString){
-//				MultiLineString line = (MultiLineString)feature.getDefaultGeometry();
-//				geom = (LineString)line.getGeometryN(0);
-//
-//				// Read the feature attributes and assign to the ZoneAgent
-//				String name = (String)feature.getAttribute("Name");
-//				double flowRate = (Long)feature.getAttribute("Flow_Rate");
-//				agent = new WaterLine(name, flowRate);
-//			}
 
 			if (agent != null){
 				context.add(agent);
@@ -174,7 +176,9 @@ public class ContextCreator implements ContextBuilder<Object> {
 			else{
 				System.out.println("Error creating agent for  " + geom);
 			}
-		}				
+		}
+		
+		return geometries;
 	}
 
 }

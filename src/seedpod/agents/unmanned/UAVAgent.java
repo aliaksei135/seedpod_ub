@@ -12,16 +12,16 @@ public class UAVAgent extends BaseAircraftAgent {
 	private static final int SEP_DIST_M = 1000; //About 0.5nm
 		
 	
-	public UAVAgent(Geometry destination) {
-		super(destination);
+	public UAVAgent() {
+		super();
 		speedMPS = 20; //About 40kts
 	}
 
 
-	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
-			watcheeFieldNames = "airborne", //Ignore if not airborne
-			query = "within " + SEP_DIST_M,
-			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
+//	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
+//			watcheeFieldNames = "airborne", //Ignore if not airborne
+//			query = "within " + SEP_DIST_M,
+//			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
 	@Override
 	public void onBufferInfringed() {
 		super.onBufferInfringed();
