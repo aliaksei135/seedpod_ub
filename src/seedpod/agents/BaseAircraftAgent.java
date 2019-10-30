@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.tools.ant.taskdefs.Get;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -12,7 +14,10 @@ import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.util.ContextUtils;
+import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.ground.BaseGroundAgent;
+import seedpod.constants.EAirspaceClass;
+
 import static seedpod.constants.Constants.*;
 
 public abstract class BaseAircraftAgent {
@@ -81,26 +86,13 @@ public abstract class BaseAircraftAgent {
 		onPath = false;
 	}
 	
-	public void moveAlongPath() {
-		
-	}
-	
-//	public boolean isBufferInfringed() {
-//		
-//	}
+	public abstract List<AirspaceAgent> getAirspaceObstacles();
 	
 	public void findPath() {
 		System.out.println("Planning path");
 		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
 		
-		Iterator objIterator = geography.getAllObjects().iterator();
-		List<Object> obstaclesList = new ArrayList<>();
-		while(objIterator.hasNext()) {
-			Object obj = objIterator.next();
-			if (obj instanceof BaseGroundAgent) { //TODO change this to airspace class
-				obstaclesList.add(obj);
-			}
-		}
+		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
 		
 		//TODO find path around obstacles defined by points
 		this.pathCoords.add(this.destination);
