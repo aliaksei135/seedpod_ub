@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -22,6 +24,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.triangulate.ConformingDelaunayTriangulator;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
@@ -76,7 +79,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 //		}
 		System.out.println(hospitals);
 		
-		int uavCount = 5;
+		int uavCount = 20;
 		airspaceGeography.setAdder(new UAVAdder(hospitals));
 		Adder uavAdder = airspaceGeography.getAdder();
 		for(int i=0;i<uavCount;i++) {
@@ -159,7 +162,6 @@ public class ContextCreator implements ContextBuilder<Object> {
 					agent = agentClass.getDeclaredConstructor().newInstance();
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				agent.setReadableName(name);
@@ -182,6 +184,17 @@ public class ContextCreator implements ContextBuilder<Object> {
 		}
 		
 		return geometries;
+	}
+	
+	
+	public void generateNavMesh(List<Geometry> obstacleGeometries) {
+		List<Coordinate> initialVertices = new ArrayList<>(obstacleGeometries.size());
+		for(Geometry geometry : obstacleGeometries) {
+			initialVertices.addAll(Arrays.asList(geometry.getCoordinates()));
+		}
+		ConformingDelaunayTriangulator triangulator = new ConformingDelaunayTriangulator(initialVertices, 1e-6);
+		triangulator.formInitialDelaunay();
+		triangulator.enforceConstraints();
 	}
 
 }

@@ -47,7 +47,6 @@ public abstract class BaseAircraftAgent {
 
 	@ScheduledMethod(start = 1, interval = 1)
 	public void fly() {
-		System.out.println("Flying");
 		
 		this.context = ContextUtils.getContext(this);
 		this.geography = (Geography)context.getProjection("airspace_geo");
@@ -72,6 +71,7 @@ public abstract class BaseAircraftAgent {
 			if(this.pathCoords.size()-1 == this.pathIndex) {
 				//Check if at final destination, if so destroy agent
 				destroy();
+				return;
 			} else {
 				this.pathIndex++;
 			}
@@ -82,7 +82,7 @@ public abstract class BaseAircraftAgent {
 		airborne = true;
 	}
 
-	public void onBufferInfringed() {
+	public void onBufferInfringed(BaseAircraftAgent conflictingAgent) {
 		onPath = false;
 	}
 	

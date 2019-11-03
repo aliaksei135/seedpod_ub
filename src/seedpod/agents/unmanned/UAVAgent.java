@@ -29,13 +29,13 @@ public class UAVAgent extends BaseAircraftAgent {
 	}
 
 
-	@Watch(watcheeClassName = "seedpod.agents.UAVAgent",
+	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
 			watcheeFieldNames = "airborne", //Ignore if not airborne
-			query = "within " + SEP_DIST_M,
+			query = "within " + SEP_DIST_M ,
 			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
 	@Override
-	public void onBufferInfringed() {
-		super.onBufferInfringed();
+	public void onBufferInfringed(BaseAircraftAgent conflictingAgent) {
+		super.onBufferInfringed(conflictingAgent);
 	}
 
 
