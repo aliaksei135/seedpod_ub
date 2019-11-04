@@ -7,9 +7,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import repast.simphony.random.RandomHelper;
 import repast.simphony.space.gis.Geography;
-import repast.simphony.space.gis.RandomGISAdder;
 import seedpod.agents.BaseGISAdder;
-import seedpod.agents.manned.MannedAircraftAgent;
 
 public class UAVAdder extends BaseGISAdder {
 	
@@ -37,7 +35,7 @@ public class UAVAdder extends BaseGISAdder {
 		UAVAgent agent = (UAVAgent) object;
 		agent.setDestination(destination);
 		projection.move(agent, origin);
-		System.out.println("Added UAV");
+//		System.out.println("Added UAV");
 	}
 	
 }

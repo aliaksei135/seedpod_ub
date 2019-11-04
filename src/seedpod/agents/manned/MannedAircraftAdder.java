@@ -6,7 +6,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 import repast.simphony.random.RandomHelper;
-import repast.simphony.relogo.ide.dynamics.NetLogoSystemDynamicsParser.intg_return;
 import repast.simphony.space.gis.Geography;
 import seedpod.agents.BaseGISAdder;
 

@@ -4,14 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.stringtemplate.v4.compiler.CodeGenerator.includeExpr_return;
-
-import com.vividsolutions.jts.geom.Geometry;
-
 import repast.simphony.engine.watcher.Watch;
 import repast.simphony.engine.watcher.WatcherTriggerSchedule;
-import repast.simphony.relogo.ide.dynamics.NetLogoSystemDynamicsParser.intg_return;
-import repast.simphony.space.gis.Geography;
 import seedpod.agents.BaseAircraftAgent;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.constants.EAirspaceClass;

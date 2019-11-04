@@ -1,13 +1,8 @@
 package seedpod.agents.ground;
 
-import java.util.List;
-
-import org.opengis.feature.simple.SimpleFeatureType;
-
 import com.vividsolutions.jts.geom.Geometry;
 
-import repast.simphony.space.gis.FeatureAgent;
-import repast.simphony.space.gis.Geography;
+import repast.simphony.parameter.Parameter;
 
 public class BaseGroundAgent{
 	
@@ -25,6 +20,8 @@ public class BaseGroundAgent{
 	public void setId(String id) {
 		this.id = id;
 	}
+	@Parameter(usageName = "readableName",
+			displayName = "Name")
 	public String getReadableName() {
 		return readableName;
 	}

@@ -7,11 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.poi.xslf.model.geom.Guide;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -19,10 +17,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.triangulate.ConformingDelaunayTriangulator;
 
@@ -30,24 +25,19 @@ import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.dataLoader.ContextBuilder;
-import repast.simphony.gis.util.GeometryUtil;
-import repast.simphony.random.RandomHelper;
-import repast.simphony.relogo.ide.dynamics.NetLogoSystemDynamicsParser.intg_return;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
 import repast.simphony.space.projection.Adder;
 import seedpod.agents.ground.AerodromeAgent;
 import seedpod.agents.ground.BaseGroundAgent;
 import seedpod.agents.ground.HospitalAgent;
-import seedpod.agents.manned.MannedAircraftAdder;
-import seedpod.agents.manned.MannedAircraftAgent;
 import seedpod.agents.unmanned.UAVAdder;
 import seedpod.agents.unmanned.UAVAgent;
 
 public class ContextCreator implements ContextBuilder<Object> {
 	
 	static final String HOSPITAL_SHAPEFILE = "data/hospitals.shp";
-	static final String AERODROME_SHAPEFILE = "data/aerodromes.shp";
+	static final String AERODROME_SHAPEFILE = "data/aerodrome.shp";
 	static final String GEOFEATURES_SHAPEFILE = "data/geofeatures.shp";
 
 	@Override
@@ -62,13 +52,13 @@ public class ContextCreator implements ContextBuilder<Object> {
 		Geography<Object> airspaceGeography = geographyFactory.createGeography("airspace_geo",
 				context,
 				geoParams);
-//		Geography<Object> physicalGeography = geographyFactory.createGeography("physical_geo",
+//		Geography<Object> metaGeography = geographyFactory.createGeography("meta_geo",
 //				context,
 //				geoParams);
 		
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
-//		List<Geometry> aerodromes = loadFeatures(AERODROME_SHAPEFILE, context, airspaceGeography, AerodromeAgent.class);
+		List<Geometry> aerodromes = loadFeatures(AERODROME_SHAPEFILE, context, airspaceGeography, AerodromeAgent.class);
 		List<Geometry> hospitals = loadFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography, HospitalAgent.class);
 		
 //		int mannedACCount = 5;
@@ -77,11 +67,10 @@ public class ContextCreator implements ContextBuilder<Object> {
 //		for(int i=0;i<mannedACCount;i++) {
 //			mannedAdder.add(airspaceGeography, new MannedAircraftAgent());
 //		}
-		System.out.println(hospitals);
 		
 		int uavCount = 20;
-		airspaceGeography.setAdder(new UAVAdder(hospitals));
-		Adder uavAdder = airspaceGeography.getAdder();
+//		airspaceGeography.setAdder(new UAVAdder(hospitals));
+		Adder uavAdder = new UAVAdder(hospitals);
 		for(int i=0;i<uavCount;i++) {
 			UAVAgent agent = new UAVAgent();
 			context.add(agent);

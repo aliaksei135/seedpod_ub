@@ -1,11 +1,6 @@
 package seedpod.agents.ground;
 
-import java.util.List;
-
-import org.opengis.feature.simple.SimpleFeatureType;
-
-import repast.simphony.space.gis.Geography;
-import seedpod.agents.BaseGISAdder;
+import repast.simphony.parameter.Parameter;
 
 public class HospitalAgent extends BaseGroundAgent {
 	
@@ -15,6 +10,8 @@ public class HospitalAgent extends BaseGroundAgent {
 	
 	public boolean isEmergency;
 
+	@Parameter(displayName = "Has A&E",
+			usageName = "emergency")
 	public boolean isEmergency() {
 		return isEmergency;
 	}

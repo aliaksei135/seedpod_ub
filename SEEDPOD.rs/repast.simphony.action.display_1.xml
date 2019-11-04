@@ -3,6 +3,14 @@
   <type>GIS 3D</type>
   <styles>
     <entry>
+      <string>seedpod.agents.meta.Marker</string>
+      <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
+    </entry>
+    <entry>
+      <string>seedpod.agents.ground.AerodromeAgent</string>
+      <string>repast.simphony.visualization.gis3D.style.DefaultMarkStyle</string>
+    </entry>
+    <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
       <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
     </entry>
@@ -12,6 +20,14 @@
     </entry>
   </styles>
   <editedStyles>
+    <entry>
+      <string>seedpod.agents.meta.Marker</string>
+      <string>seedpod.agents.meta.Marker.style_4.xml</string>
+    </entry>
+    <entry>
+      <string>seedpod.agents.ground.AerodromeAgent</string>
+      <null/>
+    </entry>
     <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
       <string>seedpod.agents.ground.HospitalAgent.style_1.xml</string>
@@ -31,17 +47,25 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-1753259284</hashCode>
+    <hashCode>1441541958</hashCode>
   </schedParams>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>seedpod.agents.ground.HospitalAgent</string>
+      <string>seedpod.agents.meta.Marker</string>
       <int>0</int>
     </entry>
     <entry>
-      <string>seedpod.agents.unmanned.UAVAgent</string>
+      <string>seedpod.agents.ground.AerodromeAgent</string>
       <int>1</int>
+    </entry>
+    <entry>
+      <string>seedpod.agents.ground.HospitalAgent</string>
+      <int>2</int>
+    </entry>
+    <entry>
+      <string>seedpod.agents.unmanned.UAVAgent</string>
+      <int>3</int>
     </entry>
   </layerOrder>
   <projections>
@@ -68,7 +92,7 @@
     <alpha>255</alpha>
   </backgroundColor>
   <renderQuality>MEDIUM</renderQuality>
-  <viewType>FLAT</viewType>
+  <viewType>GLOBE</viewType>
   <trackAgents>false</trackAgents>
   <globeLayers>
     <entry>
