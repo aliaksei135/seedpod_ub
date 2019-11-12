@@ -1,6 +1,8 @@
-<context id="SEEDPOD" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://repast.org/scenario/context">
-  	
-  	<projection type="geography" id="airspace_geo"></projection>
-  	<!-- <projection type="geography" id="meta_geo"></projection>-->
-  	
+<context id="SEEDPOD"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://repast.org/scenario/context">
+
+	<projection type="geography" id="airspace_geo"></projection>
+	<!-- <projection type="geography" id="meta_geo"></projection> -->
+
 </context>

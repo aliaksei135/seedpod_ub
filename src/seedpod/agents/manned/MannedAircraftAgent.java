@@ -16,7 +16,6 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 	
 	private static final List<EAirspaceClass> PERMISSABLE_AIRSPACE_CLASSES = 
 			List.of(EAirspaceClass.CLASS_A,
-					EAirspaceClass.CLASS_B,
 					EAirspaceClass.CLASS_C,
 					EAirspaceClass.CLASS_D,
 					EAirspaceClass.CLASS_E,

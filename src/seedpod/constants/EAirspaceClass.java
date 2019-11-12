@@ -4,7 +4,6 @@ public enum EAirspaceClass {
 	
 	//Controlled
 	CLASS_A,
-	CLASS_B, //Not used in UK
 	CLASS_C,
 	CLASS_D,
 	//Uncontrolled

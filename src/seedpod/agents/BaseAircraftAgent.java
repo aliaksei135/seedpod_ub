@@ -1,17 +1,20 @@
 package seedpod.agents;
 
-import static seedpod.constants.Constants.DESTINATION_BOUNDARY;
+import static seedpod.constants.Constants.WAYPOINT_BOUNDARY;
 import static seedpod.constants.Constants.ORIGIN_RSIVA_TICKS;
 import static seedpod.constants.Constants.SIM_TICK_SECS;
+import static seedpod.constants.Constants.AVOIDANCE_MOMENTUM;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dongbat.walkable.FloatArray;
+import com.dongbat.walkable.PathHelper;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 import repast.simphony.context.Context;
-import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.engine.schedule.ScheduledMethod;import repast.simphony.relogo.ide.intf.NetLogoInterfaceParser.floatnum_return;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
@@ -21,6 +24,7 @@ public abstract class BaseAircraftAgent {
 	
 	protected Coordinate currentPosition;
 	protected Coordinate nextPoint;
+	protected double flightpathBearing;
 	protected Coordinate destination;
 	protected ArrayList<Coordinate> pathCoords;
 	protected int pathIndex = 0;
@@ -65,7 +69,6 @@ public abstract class BaseAircraftAgent {
 		this.nextPoint = this.pathCoords.get(this.pathIndex);
 		//Find angle between current position and next point in path
 		//This assumes points are close together and far from poles
-		//which are both true of solent region
 		double dy = nextPoint.y - this.currentPosition.y;
 		double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(nextPoint.x-this.currentPosition.x);
 		double dist = Math.sqrt(dy*dy + dx*dx);
@@ -73,14 +76,18 @@ public abstract class BaseAircraftAgent {
 		if(angleRad < 0) {
 			angleRad = angleRad + 2*Math.PI;
 		}
+		this.flightpathBearing = angleRad;
 		
-		if(dist < DESTINATION_BOUNDARY) {
-			if(this.pathCoords.size()-1 == this.pathIndex) {
+		if(dist < WAYPOINT_BOUNDARY) {
+			if(this.nextPointDestination) {
 				//Check if at final destination, if so destroy agent
 				destroy();
 				return;
 			} else {
 				this.pathIndex++;
+				if(this.pathCoords.size()-2 == this.pathIndex) {
+					this.nextPointDestination = true;
+				}
 			}
 		}
 		
@@ -94,17 +101,30 @@ public abstract class BaseAircraftAgent {
 		//Prevent self-detection
 		if(conflictingAgent.hashCode() == this.hashCode()) return;
 		
+		//Try not to calculate distance where possible 
 		if(this.simTickLife > ORIGIN_RSIVA_TICKS) {
-			this.onPath = false;
-			dropMarker();
-			this.inTCAS = true;
-			Coordinate conflicterCoordinate = conflictingAgent.currentPosition;
-			double dy = conflicterCoordinate.y - this.currentPosition.y;
-			double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(conflicterCoordinate.x-this.currentPosition.x);
-			double angleRad = Math.atan2(dy, dx);
-			double avoidanceAngleRad = (angleRad + Math.PI) % (2*Math.PI);
-			this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, avoidanceAngleRad);
+			performAvoidanceActions(conflictingAgent);
+		}else if(this.nextPointDestination) {
+			double dy = this.destination.y - this.currentPosition.y;
+			double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(this.destination.x-this.currentPosition.x);
+			double dist = Math.sqrt(dy*dy + dx*dx);
+			if(dist < WAYPOINT_BOUNDARY) {
+				performAvoidanceActions(conflictingAgent);
+			}
 		}
+	}
+	
+	public void performAvoidanceActions(BaseAircraftAgent conflictingAgent) {
+		this.onPath = false;
+		this.inTCAS = true;
+		dropMarker();
+		Coordinate conflicterCoordinate = conflictingAgent.currentPosition;
+		double dy = conflicterCoordinate.y - this.currentPosition.y;
+		double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(conflicterCoordinate.x-this.currentPosition.x);
+		double angleRad = Math.atan2(dy, dx);
+		double maxAvoidanceAngleRad = (angleRad + Math.PI);
+		double avoidanceAngleRad = (AVOIDANCE_MOMENTUM*(maxAvoidanceAngleRad-this.flightpathBearing) + this.flightpathBearing) % (2*Math.PI);
+		this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, avoidanceAngleRad);
 	}
 	
 	public void dropMarker() {
@@ -118,12 +138,32 @@ public abstract class BaseAircraftAgent {
 	
 	public void findPath() {
 		System.out.println("Planning path");
+		this.pathCoords.clear();
 		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
 		
 		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
 		
-		//TODO find path around obstacles defined by points
-		this.pathCoords.add(this.destination);
+		PathHelper pathHelper = new PathHelper(180, 90);
+		
+		for(AirspaceAgent obstacle : obstaclesList) {
+			Coordinate[] coords = obstacle.getPolygon().getCoordinates();
+			float[] coordArray = new float[coords.length*2];
+			for(int i=0;i<coords.length;i++) {
+				coordArray[2*i] = (float) coords[i].x;
+				coordArray[(2*i)+1] = (float) coords[i].y;
+			}
+			pathHelper.addPolygon(coordArray);
+		}
+		
+		FloatArray path = new FloatArray();
+		pathHelper.findPath((float)this.currentPosition.x, (float)this.currentPosition.y,
+				(float)this.destination.x, (float)this.destination.y,
+				0, path);
+		
+		for(int i=0;i<path.size/2;i++) {
+			Coordinate coord = new Coordinate((double)path.items[2*i], path.items[(2*i)+1]);
+			this.pathCoords.add(coord);
+		}
 		// Reset index for new path
 		this.pathIndex = 0;
 		this.onPath = true;
