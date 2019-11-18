@@ -8,6 +8,8 @@ public class AirspaceAgent {
 	
 	Geometry polygon;
 	EAirspaceClass airspaceClass;
+	double baseM;
+	double ceilingM;
 
 	public AirspaceAgent() {
 		
@@ -27,6 +29,22 @@ public class AirspaceAgent {
 
 	public void setAirspaceClass(EAirspaceClass airspaceClass) {
 		this.airspaceClass = airspaceClass;
+	}
+
+	public double getBaseM() {
+		return baseM;
+	}
+
+	public void setBaseM(double baseM) {
+		this.baseM = baseM;
+	}
+
+	public double getCeilingM() {
+		return ceilingM;
+	}
+
+	public void setCeilingM(double ceilingM) {
+		this.ceilingM = ceilingM;
 	}
 	
 	

@@ -1,7 +1,7 @@
 package seedpod.agents;
 
-import static seedpod.constants.Filepaths.AERODROME_SHAPEFILE;
-import static seedpod.constants.Filepaths.HOSPITAL_SHAPEFILE;
+import static seedpod.constants.Filepaths.*;
+import static seedpod.constants.Constants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -56,12 +57,13 @@ public class ContextCreator implements ContextBuilder<Object> {
 		
 		List<Geometry> aerodromes = loadGroundFeatures(AERODROME_SHAPEFILE, context, airspaceGeography, AerodromeAgent.class);
 		List<Geometry> hospitals = loadGroundFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography, HospitalAgent.class);
+		List<Geometry> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
 		
-		List<Geometry> airspace = new ArrayList<>();
-		for(int i=0;i<EAirspaceClass.values().length;i++) {
-			System.out.println("Loading " + EAirspaceClass.values()[i]);
-			airspace.addAll(loadAirspaceFeatures(Filepaths.AIRSPACE_PATH_STRINGS[i], context, airspaceGeography, AirspaceAgent.class, EAirspaceClass.values()[i]));
-		}
+//		List<Geometry> airspace = new ArrayList<>();
+//		for(int i=0;i<EAirspaceClass.values().length;i++) {
+//			System.out.println("Loading " + EAirspaceClass.values()[i]);
+//			airspace.addAll(loadAirspaceFeatures(Filepaths.AIRSPACE_PATH_STRINGS[i], context, airspaceGeography, AirspaceAgent.class, EAirspaceClass.values()[i]));
+//		}
 		
 //		int mannedACCount = 5;
 //		airspaceGeography.setAdder(new MannedAircraftAdder(aerodromes));
@@ -177,17 +179,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 		return geometries;
 	}
 	
-	/**
-	 * Loads features from the specified shapefile.  The appropriate type of agents
-	 * will be created depending on the geometry type in the shapefile (point, 
-	 * line, polygon).
-	 * 
-	 * @param filename the name of the shapefile from which to load agents
-	 * @param context the context
-	 * @param geography the geography
-	 * @param agentClass class of agent to create
-	 */
-	private List<Geometry> loadAirspaceFeatures(String filename, Context context, Geography geography, Class<? extends AirspaceAgent> agentClass, EAirspaceClass airspaceClass){
+	private List<Geometry> loadAirspaceFeatures(String filename, Context context, Geography geography){
 
 		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
 		
@@ -196,37 +188,81 @@ public class ContextCreator implements ContextBuilder<Object> {
 		// For each feature in the file
 		for (SimpleFeature feature : features){
 			Geometry geom = (Geometry)feature.getDefaultGeometry();
-			AirspaceAgent agent = null;
-
-			if (!geom.isValid()){
-				System.out.println("Invalid geometry: " + feature.getID());
-			}
+			AirspaceAgent agent = new AirspaceAgent();
 			
 			if (geom instanceof MultiPolygon){
 				MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometry();
 				geom = (Polygon)mp.getGeometryN(0);				
-
-				try {
-					agent = agentClass.getDeclaredConstructor().newInstance();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
+				
+				String airspaceClassString = ((String) feature.getAttribute("AirSpaceTy")).strip();
+				EAirspaceClass airspaceClass = null;
+				for(EAirspaceClass aClass : EAirspaceClass.values()) {
+					if(aClass.equalsName(airspaceClassString)) {
+						airspaceClass = aClass;
+						break;
+					}
 				}
+				
+				double baseFT = (double) feature.getAttribute("Base");
+				double baseM = baseFT * 0.3048;
+				long extrudedFT = (long) feature.getAttribute("Extruded");
+				double ceilingM = baseM + (0.3048 * extrudedFT);
+				
 				agent.setAirspaceClass(airspaceClass);
+				agent.setBaseM(baseM);
+				agent.setCeilingM(ceilingM);
 				agent.setPolygon(geom);
 				geometries.add(geom);
-			}
-
-			if (agent != null){
-				context.add(agent);
+				
+				context.add(agent);				
 				geography.move(agent, geom);
 			}
-			else{
-				System.out.println("Error creating agent for  " + geom);
-			}
+			
 		}
 		
 		return geometries;
 	}
+
+//	private List<Geometry> loadAirspaceFeatures(String filename, Context context, Geography geography, Class<? extends AirspaceAgent> agentClass, EAirspaceClass airspaceClass){
+//
+//		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
+//		
+//		List<Geometry> geometries = new ArrayList<>();
+//		
+//		// For each feature in the file
+//		for (SimpleFeature feature : features){
+//			Geometry geom = (Geometry)feature.getDefaultGeometry();
+//			AirspaceAgent agent = null;
+//
+//			if (!geom.isValid()){
+//				System.out.println("Invalid geometry: " + feature.getID());
+//			}
+//			
+//			if (geom instanceof MultiPolygon){
+//				MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometry();
+//				geom = (Polygon)mp.getGeometryN(0);				
+//
+//				try {
+//					agent = agentClass.getDeclaredConstructor().newInstance();
+//				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+//						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+//					e.printStackTrace();
+//				}
+//				agent.setAirspaceClass(airspaceClass);
+//				agent.setPolygon(geom);
+//				geometries.add(geom);
+//			}
+//
+//			if (agent != null){
+//				context.add(agent);
+//				geography.move(agent, geom);
+//			}
+//			else{
+//				System.out.println("Error creating agent for  " + geom);
+//			}
+//		}
+//		
+//		return geometries;
+//	}
 
 }
