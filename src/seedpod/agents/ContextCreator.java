@@ -1,10 +1,9 @@
 package seedpod.agents;
 
-import static seedpod.constants.Filepaths.*;
+import static seedpod.constants.Filepaths.AERODROME_SHAPEFILE;
+import static seedpod.constants.Filepaths.HOSPITAL_SHAPEFILE;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -13,22 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.kml.KML;
-import org.geotools.kml.KMLConfiguration;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Symbolizer;
-import org.geotools.xsd.Parser;
-import org.geotools.xsd.StreamingParser;
-import org.geotools.xsd.impl.StreamingParserHandler;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
@@ -123,19 +115,6 @@ public class ContextCreator implements ContextBuilder<Object> {
 		return features;
 	}
 	
-//	private List<SimpleFeature> loadFeaturesFromKML(String filename){
-//		
-//		try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filename));){
-//			Parser parser = new Parser(new KMLConfiguration());
-//			SimpleFeature f = (SimpleFeature) parser.parse(bufferedInputStream);
-//			List<SimpleFeature> placemarks = (List<SimpleFeature>) f.getAttribute("Feature");			
-//			
-//			return placemarks;
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
 	
 	/**
 	 * Loads features from the specified shapefile.  The appropriate type of agents

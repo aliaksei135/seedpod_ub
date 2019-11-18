@@ -14,7 +14,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 import repast.simphony.context.Context;
-import repast.simphony.engine.schedule.ScheduledMethod;import repast.simphony.relogo.ide.intf.NetLogoInterfaceParser.floatnum_return;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
@@ -43,11 +43,11 @@ public abstract class BaseAircraftAgent {
 		this.pathCoords = new ArrayList<>(10);
 	}
 	
-//	@ScheduledMethod(start = 1)
-//	public void setup() {
-//		this.context = ContextUtils.getContext(this);
-//		this.geography = (Geography)context.getProjection("airspace_geo");
-//	}
+	@ScheduledMethod(start = 0)
+	public void setup() {
+		this.context = ContextUtils.getContext(this);
+		this.geography = (Geography)context.getProjection("airspace_geo");
+	}
 
 
 	@ScheduledMethod(start = 1, interval = 1)
@@ -59,13 +59,11 @@ public abstract class BaseAircraftAgent {
 			return;
 		}
 		
-		this.context = ContextUtils.getContext(this);
-		this.geography = (Geography)context.getProjection("airspace_geo");
+		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
 		
 		//Replan path if not on it
 		if(!onPath) findPath();
 		
-		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
 		this.nextPoint = this.pathCoords.get(this.pathIndex);
 		//Find angle between current position and next point in path
 		//This assumes points are close together and far from poles
@@ -139,7 +137,6 @@ public abstract class BaseAircraftAgent {
 	public void findPath() {
 		System.out.println("Planning path");
 		this.pathCoords.clear();
-		Coordinate currentPos = this.geography.getGeometry(this).getCoordinate();
 		
 		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
 		
@@ -164,9 +161,17 @@ public abstract class BaseAircraftAgent {
 			Coordinate coord = new Coordinate((double)path.items[2*i], path.items[(2*i)+1]);
 			this.pathCoords.add(coord);
 		}
+		
+		//Add destination point on end
+		this.pathCoords.add(this.destination);
+		
 		// Reset index for new path
 		this.pathIndex = 0;
 		this.onPath = true;
+		
+		if(this.pathCoords.size() <= 1) {
+			this.nextPointDestination = true;
+		}
 	}
 	
 	public void destroy() {
