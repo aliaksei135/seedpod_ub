@@ -209,9 +209,8 @@ public class ContextCreator implements ContextBuilder<Object> {
 				double ceilingM = baseM + (0.3048 * extrudedFT);
 				
 				agent.setAirspaceClass(airspaceClass);
-				agent.setBaseM(baseM);
-				agent.setCeilingM(ceilingM);
-				agent.setPolygon(geom);
+				agent.setAltitudes(baseM, ceilingM);
+				agent.setCoords(geom.getCoordinates());
 				geometries.add(geom);
 				
 				context.add(agent);				

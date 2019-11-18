@@ -13,6 +13,7 @@ import com.dongbat.walkable.PathHelper;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
+import gov.nasa.worldwind.geom.LatLon;
 import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
@@ -143,11 +144,11 @@ public abstract class BaseAircraftAgent {
 		PathHelper pathHelper = new PathHelper(180, 90);
 		
 		for(AirspaceAgent obstacle : obstaclesList) {
-			Coordinate[] coords = obstacle.getPolygon().getCoordinates();
-			float[] coordArray = new float[coords.length*2];
-			for(int i=0;i<coords.length;i++) {
-				coordArray[2*i] = (float) coords[i].x;
-				coordArray[(2*i)+1] = (float) coords[i].y;
+			List<LatLon> coords = obstacle.getLocations();
+			float[] coordArray = new float[coords.size()*2];
+			for(int i=0;i<coords.size();i++) {
+				coordArray[2*i] = (float) coords.get(i).getLongitude().getDegrees();
+				coordArray[(2*i)+1] = (float) coords.get(i).getLatitude().getDegrees();
 			}
 			pathHelper.addPolygon(coordArray);
 		}

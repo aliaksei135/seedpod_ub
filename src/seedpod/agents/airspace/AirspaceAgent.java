@@ -1,27 +1,20 @@
 package seedpod.agents.airspace;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.render.DrawContextImpl;
+import gov.nasa.worldwind.render.SurfaceShape;
+import gov.nasa.worldwind.render.airspaces.Polygon;
 import seedpod.constants.EAirspaceClass;
 
-public class AirspaceAgent {
+public class AirspaceAgent extends Polygon {
 	
-	Geometry polygon;
-	EAirspaceClass airspaceClass;
-	double baseM;
-	double ceilingM;
-
-	public AirspaceAgent() {
-		
-	}
-
-	public Geometry getPolygon() {
-		return polygon;
-	}
-
-	public void setPolygon(Geometry polygon) {
-		this.polygon = polygon;
-	}
+	private EAirspaceClass airspaceClass;
 
 	public EAirspaceClass getAirspaceClass() {
 		return airspaceClass;
@@ -29,23 +22,21 @@ public class AirspaceAgent {
 
 	public void setAirspaceClass(EAirspaceClass airspaceClass) {
 		this.airspaceClass = airspaceClass;
-	}
-
-	public double getBaseM() {
-		return baseM;
-	}
-
-	public void setBaseM(double baseM) {
-		this.baseM = baseM;
-	}
-
-	public double getCeilingM() {
-		return ceilingM;
-	}
-
-	public void setCeilingM(double ceilingM) {
-		this.ceilingM = ceilingM;
+	}	
+	
+	public void updateSurfaceShape(SurfaceShape shape) {
+		this.updateSurfaceShape(new DrawContextImpl(), shape);
 	}
 	
+	public void setCoords(Coordinate[] coords) {
+		List<LatLon> latLons = new ArrayList<>(coords.length);
+		for (Coordinate coordinate : coords) {
+			Angle lat = Angle.fromDegreesLatitude(coordinate.y);
+			Angle lon = Angle.fromDegreesLongitude(coordinate.x);
+			LatLon latLon = new LatLon(lat, lon);
+			latLons.add(latLon);
+		}
+		this.setLocations(latLons);
+	}
 	
 }
