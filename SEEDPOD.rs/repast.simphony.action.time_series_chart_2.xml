@@ -1,9 +1,9 @@
 <repast.simphony.chart2.engine.TimeSeriesChartDescriptor simphonyVersion="2.7.0">
   <name>Airproxes</name>
   <dataSet>Airproxes</dataSet>
-  <xAxisLabel>Tick Count</xAxisLabel>
-  <yAxisLabel></yAxisLabel>
-  <chartTitle></chartTitle>
+  <xAxisLabel>Time [ticks]</xAxisLabel>
+  <yAxisLabel>Cumulative Airpoxes</yAxisLabel>
+  <chartTitle>Airproxes</chartTitle>
   <type>TIME_SERIES</type>
   <background>
     <red>192</red>

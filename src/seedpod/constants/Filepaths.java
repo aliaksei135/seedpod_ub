@@ -5,7 +5,7 @@ public final class Filepaths {
 	public static final String HOSPITAL_SHAPEFILE = "data/hospitals.shp";
 	public static final String AERODROME_SHAPEFILE = "data/aerodrome.shp";
 	public static final String AIRSPACE_SHAPEFILE = "data/airspace.shp";
-	
+
 //	public static final String AIRSPACE_CLASS_A_SHAPEFILE = "data/airspace/A/CLASS A.shp";
 //	public static final String AIRSPACE_CLASS_C_SHAPEFILE = "data/airspace/C/CLASS C.shp";
 //	public static final String AIRSPACE_CLASS_D_SHAPEFILE = "data/airspace/D/CLASS D.shp";

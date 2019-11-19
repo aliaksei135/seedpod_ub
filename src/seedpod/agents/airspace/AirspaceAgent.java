@@ -13,7 +13,7 @@ import gov.nasa.worldwind.render.airspaces.Polygon;
 import seedpod.constants.EAirspaceClass;
 
 public class AirspaceAgent extends Polygon {
-	
+
 	private EAirspaceClass airspaceClass;
 
 	public EAirspaceClass getAirspaceClass() {
@@ -22,12 +22,12 @@ public class AirspaceAgent extends Polygon {
 
 	public void setAirspaceClass(EAirspaceClass airspaceClass) {
 		this.airspaceClass = airspaceClass;
-	}	
-	
+	}
+
 	public void updateSurfaceShape(SurfaceShape shape) {
 		this.updateSurfaceShape(new DrawContextImpl(), shape);
 	}
-	
+
 	public void setCoords(Coordinate[] coords) {
 		List<LatLon> latLons = new ArrayList<>(coords.length);
 		for (Coordinate coordinate : coords) {
@@ -38,5 +38,5 @@ public class AirspaceAgent extends Polygon {
 		}
 		this.setLocations(latLons);
 	}
-	
+
 }

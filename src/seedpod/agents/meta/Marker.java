@@ -14,5 +14,5 @@ public class Marker {
 	public Coordinate getCoordinate() {
 		return coordinate;
 	}
-	
+
 }

@@ -12,7 +12,7 @@
     </entry>
     <entry>
       <string>seedpod.agents.airspace.AirspaceAgent</string>
-      <string>repast.simphony.visualization.gis3D.style.EditedSurfaceShapeStyle</string>
+      <string>seedpod.styles.Airspace3DStyle</string>
     </entry>
     <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
@@ -20,7 +20,7 @@
     </entry>
     <entry>
       <string>seedpod.agents.unmanned.UAVAgent</string>
-      <string>seedpod.agents.Aircraft3DStyle</string>
+      <string>seedpod.styles.Aircraft3DStyle</string>
     </entry>
   </styles>
   <editedStyles>
@@ -55,7 +55,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1940065996</hashCode>
+    <hashCode>-1108765055</hashCode>
   </schedParams>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
