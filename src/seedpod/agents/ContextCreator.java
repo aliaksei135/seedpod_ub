@@ -202,6 +202,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 						break;
 					}
 				}
+				if(airspaceClass == null) continue;
 				
 				double baseFT = (double) feature.getAttribute("Base");
 				double baseM = baseFT * 0.3048;

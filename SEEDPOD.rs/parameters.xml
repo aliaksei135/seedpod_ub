@@ -4,6 +4,50 @@
 		displayName="Default Random Seed" type="int" defaultValue="__NULL__"
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+		
+	<!-- Manned Aircraft -->
+	<parameter name="Manned_LateralMaxSpeedMPS"
+		displayName="Manned Max Lateral Speed (m/s)"
+		type="double" defaultValue="61.73" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="Manned_VerticalMaxSpeedMPS"
+		displayName="Manned Max Vertical Speed (m/s)"
+		type="double" defaultValue="7.62" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="Manned_RequiredVerticalSeparationM"
+		displayName="Manned Required Vertical Separation (m)"
+		type="double" defaultValue="304.8" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="Manned_EastTargetAltitudeM"
+		displayName="Manned Eastbound Target Altitude (m)"
+		type="double" defaultValue="914.4" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="Manned_WestTargetAltitudeM"
+		displayName="Manned Westbound Target Altitude (m)"
+		type="double" defaultValue="1524.0" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	
+	<!-- UAVs -->
+		<parameter name="UAV_LateralMaxSpeedMPS"
+		displayName="UAV Max Lateral Speed (m/s)"
+		type="double" defaultValue="15.43" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="UAV_VerticalMaxSpeedMPS"
+		displayName="UAV Max Vertical Speed (m/s)"
+		type="double" defaultValue="1.52" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="UAV_RequiredVerticalSeparationM"
+		displayName="UAV Required Vertical Separation (m)"
+		type="double" defaultValue="30.48" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="UAV_EastTargetAltitudeM"
+		displayName="UAV Eastbound Target Altitude (m)"
+		type="double" defaultValue="152.4" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
+	<parameter name="UAV_WestTargetAltitudeM"
+		displayName="UAV Westbound Target Altitude (m)"
+		type="double" defaultValue="304.8" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"/>
 </parameters>
 
 

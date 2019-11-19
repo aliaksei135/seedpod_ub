@@ -23,19 +23,28 @@ import seedpod.agents.meta.Marker;
 
 public abstract class BaseAircraftAgent {
 	
+	/* Agent motion fields */
 	protected Coordinate currentPosition;
+	protected double currentAltitude;
 	protected Coordinate nextPoint;
 	protected double flightpathBearing;
-	protected Coordinate destination;
 	protected ArrayList<Coordinate> pathCoords;
-	protected int pathIndex = 0;
 	
-	protected boolean airborne = false;
+	/* Agent state fields */
+	public boolean airborne = false;
 	private boolean nextPointDestination = false;
 	private boolean onPath = false;
 	protected boolean inTCAS = false;
-	protected int speedMPS;
+	protected int pathIndex = 0;
 	
+	/* Agent constant fields */
+	protected Coordinate destination;
+	protected double requiredVerticalSeparationM;
+	protected double lateralMaxSpeedMPS;
+	protected double verticalMaxSpeedMPS;
+	protected double targetAltitude;
+	
+	/* Simulation-related fields */
 	protected Context context;
 	protected Geography geography;
 	private int simTickLife = 0;
@@ -71,11 +80,6 @@ public abstract class BaseAircraftAgent {
 		double dy = nextPoint.y - this.currentPosition.y;
 		double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(nextPoint.x-this.currentPosition.x);
 		double dist = Math.sqrt(dy*dy + dx*dx);
-		double angleRad = Math.atan2(dy, dx);
-		if(angleRad < 0) {
-			angleRad = angleRad + 2*Math.PI;
-		}
-		this.flightpathBearing = angleRad;
 		
 		if(dist < WAYPOINT_BOUNDARY) {
 			if(this.nextPointDestination) {
@@ -90,7 +94,28 @@ public abstract class BaseAircraftAgent {
 			}
 		}
 		
-		this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, angleRad);
+		double angleRad = Math.atan2(dy, dx);
+		if(angleRad < 0) {
+			angleRad = angleRad + 2*Math.PI;
+		}
+		// angleRad uses angles from a standard set of x-y axes to +90deg would be North and -90deg would be South
+		// rotate this to get the bearing from North
+		this.flightpathBearing = 2.5*Math.PI - angleRad;
+		this.flightpathBearing %= 2*Math.PI;
+		
+		double dz;
+		if(this.currentAltitude == this.targetAltitude) {
+			dz = 0;
+		} else {
+			dz = verticalMaxSpeedMPS * SIM_TICK_SECS;
+			double targetDelZ = this.targetAltitude - this.currentAltitude;
+			if(dz > targetDelZ) {
+				dz = targetDelZ;
+			}
+		}
+		
+		this.geography.moveByVector(this, this.lateralMaxSpeedMPS*SIM_TICK_SECS, angleRad);
+		this.currentAltitude += dz;
 		
 		airborne = true;
 		this.simTickLife++;
@@ -122,8 +147,9 @@ public abstract class BaseAircraftAgent {
 		double dx = Math.cos(Math.PI/180*this.currentPosition.y)*(conflicterCoordinate.x-this.currentPosition.x);
 		double angleRad = Math.atan2(dy, dx);
 		double maxAvoidanceAngleRad = (angleRad + Math.PI);
-		double avoidanceAngleRad = (AVOIDANCE_MOMENTUM*(maxAvoidanceAngleRad-this.flightpathBearing) + this.flightpathBearing) % (2*Math.PI);
-		this.geography.moveByVector(this, this.speedMPS*SIM_TICK_SECS, avoidanceAngleRad);
+		double currentAngleRad = 2.5*Math.PI - this.flightpathBearing; 
+		double avoidanceAngleRad = (AVOIDANCE_MOMENTUM*(maxAvoidanceAngleRad-currentAngleRad) + currentAngleRad) % (2*Math.PI);
+		this.geography.moveByVector(this, this.lateralMaxSpeedMPS*SIM_TICK_SECS, avoidanceAngleRad);
 	}
 	
 	public void dropMarker() {
@@ -141,27 +167,27 @@ public abstract class BaseAircraftAgent {
 		
 		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
 		
-		PathHelper pathHelper = new PathHelper(180, 90);
-		
-		for(AirspaceAgent obstacle : obstaclesList) {
-			List<LatLon> coords = obstacle.getLocations();
-			float[] coordArray = new float[coords.size()*2];
-			for(int i=0;i<coords.size();i++) {
-				coordArray[2*i] = (float) coords.get(i).getLongitude().getDegrees();
-				coordArray[(2*i)+1] = (float) coords.get(i).getLatitude().getDegrees();
-			}
-			pathHelper.addPolygon(coordArray);
-		}
-		
-		FloatArray path = new FloatArray();
-		pathHelper.findPath((float)this.currentPosition.x, (float)this.currentPosition.y,
-				(float)this.destination.x, (float)this.destination.y,
-				0, path);
-		
-		for(int i=0;i<path.size/2;i++) {
-			Coordinate coord = new Coordinate((double)path.items[2*i], path.items[(2*i)+1]);
-			this.pathCoords.add(coord);
-		}
+//		PathHelper pathHelper = new PathHelper(180, 90);
+//		
+//		obstaclesList.parallelStream().forEach(obstacle -> {
+//			List<LatLon> coords = obstacle.getLocations();
+//			float[] coordArray = new float[coords.size()*2];
+//			for(int i=0;i<coords.size();i++) {
+//				coordArray[2*i] = (float) coords.get(i).getLongitude().getDegrees();
+//				coordArray[(2*i)+1] = (float) coords.get(i).getLatitude().getDegrees();
+//			}
+//			pathHelper.addPolygon(coordArray);
+//		});
+//		
+//		FloatArray path = new FloatArray();
+//		pathHelper.findPath((float)this.currentPosition.x, (float)this.currentPosition.y,
+//				(float)this.destination.x, (float)this.destination.y,
+//				0, path);
+//		
+//		for(int i=0;i<path.size/2;i++) {
+//			Coordinate coord = new Coordinate((double)path.items[2*i], path.items[(2*i)+1]);
+//			this.pathCoords.add(coord);
+//		}
 		
 		//Add destination point on end
 		this.pathCoords.add(this.destination);
@@ -188,4 +214,5 @@ public abstract class BaseAircraftAgent {
 	public void setDestination(Coordinate destination) {
 		this.destination = destination;
 	}
+
 }

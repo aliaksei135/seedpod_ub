@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.engine.schedule.ScheduleParameters;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.engine.watcher.Watch;
 import repast.simphony.engine.watcher.WatcherTriggerSchedule;
+import repast.simphony.parameter.Parameters;
 import seedpod.agents.BaseAircraftAgent;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.constants.EAirspaceClass;
 
 public class MannedAircraftAgent extends BaseAircraftAgent {
 	
-	private static final int SEP_DIST_M = 5500; //About 3nm
+	private static final double REQ_LATERAL_SEP_M = 5500; //About 3nm
 	
 	private static final List<EAirspaceClass> PERMISSABLE_AIRSPACE_CLASSES = 
 			List.of(EAirspaceClass.CLASS_A,
@@ -24,13 +28,40 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 
 	public MannedAircraftAgent() {
 		super();
-		speedMPS = 100; //About 200kts
+		Parameters p = RunEnvironment.getInstance().getParameters();
+		lateralMaxSpeedMPS = p.getDouble("Manned_LateralMaxSpeedMPS");
+		verticalMaxSpeedMPS = p.getDouble("Manned_VerticalMaxSpeedMPS");
+		requiredVerticalSeparationM = p.getDouble("Manned_RequiredVerticalSeparationM");
+	}
+	
+	@Override
+	@ScheduledMethod(start = 0)
+	public void setup() {
+		super.setup();
+		
+		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
+		//This assumes points are close together and far from poles
+		double destinationDelY = this.destination.y - this.currentPosition.y;
+		double destinationDelX = Math.cos(Math.PI/180*this.currentPosition.y)*(this.destination.x-this.currentPosition.x);
+		double angleRad = Math.atan2(destinationDelY, destinationDelX);
+		this.flightpathBearing = 2*Math.PI - (angleRad - Math.PI/2);
+		this.flightpathBearing %= 2*Math.PI;
+		
+		Parameters p = RunEnvironment.getInstance().getParameters();
+		if(this.flightpathBearing < Math.PI) {
+			this.targetAltitude = p.getDouble("Manned_EastTargetAltitudeM");
+		} else {
+			this.targetAltitude = p.getDouble("Manned_WestTargetAltitudeM");
+		}
 	}
 
 	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
 			watcheeFieldNames = "airborne", //Ignore if not airborne
-			query = "within " + SEP_DIST_M,
-			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE)
+			query = "within " + REQ_LATERAL_SEP_M + " 'airspace_geo'",
+			scheduleTriggerPriority = ScheduleParameters.FIRST_PRIORITY,
+			triggerCondition = "$watcher.airborne",
+			shuffle = false,
+			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
 	@Override
 	public void onBufferInfringed(BaseAircraftAgent conflictingAgent) {
 		super.onBufferInfringed(conflictingAgent);
