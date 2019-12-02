@@ -16,7 +16,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
-import seedpod.agents.meta.Marker;
+import seedpod.agents.meta.AirproxMarker;
 
 public abstract class BaseAircraftAgent {
 
@@ -162,7 +162,7 @@ public abstract class BaseAircraftAgent {
 	}
 
 	public void dropAirproxMarker() {
-		Marker marker = new Marker(this.currentPosition);
+		AirproxMarker marker = new AirproxMarker(this.currentPosition);
 		this.context.add(marker);
 		Geometry currentPos = this.geography.getGeometry(this);
 		((Geography) this.context.getProjection("airspace_geo")).move(marker, currentPos);

@@ -2,11 +2,11 @@ package seedpod.agents.meta;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class Marker {
+public abstract class BaseMarker {
 
 	Coordinate coordinate;
 
-	public Marker(Coordinate coordinate) {
+	public BaseMarker(Coordinate coordinate) {
 		super();
 		this.coordinate = coordinate;
 	}

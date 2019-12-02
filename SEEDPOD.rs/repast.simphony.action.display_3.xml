@@ -3,7 +3,7 @@
   <type>GIS 3D</type>
   <styles>
     <entry>
-      <string>seedpod.agents.meta.Marker</string>
+      <string>seedpod.agents.meta.AirproxMarker</string>
       <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
     </entry>
     <entry>
@@ -25,7 +25,7 @@
   </styles>
   <editedStyles>
     <entry>
-      <string>seedpod.agents.meta.Marker</string>
+      <string>seedpod.agents.meta.AirproxMarker</string>
       <string>seedpod.agents.meta.Marker.style_4.xml</string>
     </entry>
     <entry>
@@ -60,7 +60,7 @@
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>seedpod.agents.meta.Marker</string>
+      <string>seedpod.agents.meta.AirproxMarker</string>
       <int>0</int>
     </entry>
     <entry>

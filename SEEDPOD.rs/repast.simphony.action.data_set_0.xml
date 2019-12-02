@@ -19,7 +19,7 @@
     <entry>
       <string>Airprox</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
-        <typeName>seedpod.agents.meta.Marker</typeName>
+        <typeName>seedpod.agents.meta.AirproxMarker</typeName>
         <id>Airprox</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
