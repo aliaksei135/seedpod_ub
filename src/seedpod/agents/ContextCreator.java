@@ -3,6 +3,7 @@ package seedpod.agents;
 import static seedpod.constants.Filepaths.AERODROME_SHAPEFILE;
 import static seedpod.constants.Filepaths.AIRSPACE_SHAPEFILE;
 import static seedpod.constants.Filepaths.HOSPITAL_SHAPEFILE;
+import static seedpod.constants.Constants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -25,14 +27,19 @@ import com.vividsolutions.jts.geom.Polygon;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
+import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
+import repast.simphony.space.gis.GISNetworkListener;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
+import repast.simphony.space.graph.Network;
 import repast.simphony.space.projection.Adder;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.ground.AerodromeAgent;
 import seedpod.agents.ground.BaseGroundAgent;
 import seedpod.agents.ground.HospitalAgent;
+import seedpod.agents.manned.MannedAircraftAdder;
+import seedpod.agents.manned.MannedAircraftAgent;
 import seedpod.agents.unmanned.UAVAdder;
 import seedpod.agents.unmanned.UAVAgent;
 import seedpod.constants.EAirspaceClass;
@@ -48,8 +55,12 @@ public class ContextCreator implements ContextBuilder<Object> {
 		geoParams.getAdder();
 		GeographyFactory geographyFactory = GeographyFactoryFinder.createGeographyFactory(null);
 		Geography<Object> airspaceGeography = geographyFactory.createGeography("airspace_geo", context, geoParams);
+		
+		NetworkBuilder networkBuilder = new NetworkBuilder<>("routes", context, true);
+		Network routeNetwork = networkBuilder.buildNetwork();
 
 		GeometryFactory geometryFactory = new GeometryFactory();
+//		new GISNetworkListener(context, airspaceGeography, routeNetwork);
 
 		List<Geometry> aerodromes = loadGroundFeatures(AERODROME_SHAPEFILE, context, airspaceGeography,
 				AerodromeAgent.class);
@@ -63,14 +74,15 @@ public class ContextCreator implements ContextBuilder<Object> {
 //			airspace.addAll(loadAirspaceFeatures(Filepaths.AIRSPACE_PATH_STRINGS[i], context, airspaceGeography, AirspaceAgent.class, EAirspaceClass.values()[i]));
 //		}
 
-//		int mannedACCount = 5;
-//		airspaceGeography.setAdder(new MannedAircraftAdder(aerodromes));
-//		Adder mannedAdder = airspaceGeography.getAdder();
-//		for(int i=0;i<mannedACCount;i++) {
-//			mannedAdder.add(airspaceGeography, new MannedAircraftAgent());
-//		}
+		int mannedACCount = 5;
+		Adder mannedAdder = new MannedAircraftAdder(aerodromes);
+		for(int i=0;i<mannedACCount;i++) {
+			MannedAircraftAgent agent = new MannedAircraftAgent();
+			context.add(agent);
+			mannedAdder.add(airspaceGeography, agent);
+		}
 
-		int uavCount = 20;
+		int uavCount = 30;
 		Adder uavAdder = new UAVAdder(hospitals);
 		for (int i = 0; i < uavCount; i++) {
 			UAVAgent agent = new UAVAgent();
@@ -188,6 +200,15 @@ public class ContextCreator implements ContextBuilder<Object> {
 			if (geom instanceof MultiPolygon) {
 				MultiPolygon mp = (MultiPolygon) feature.getDefaultGeometry();
 				geom = mp.getGeometryN(0);
+				Coordinate centroidCoordinate = geom.getCoordinate();
+				
+				//Check if centroid within sim areas bounds
+				if(centroidCoordinate.x > MAX_LON 
+						|| centroidCoordinate.x < MIN_LON
+						|| centroidCoordinate.y > MAX_LAT
+						|| centroidCoordinate.y < MIN_LAT) {
+					continue;
+				}
 
 				String airspaceClassString = ((String) feature.getAttribute("AirSpaceTy")).strip();
 				EAirspaceClass airspaceClass = null;

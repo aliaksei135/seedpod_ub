@@ -73,6 +73,9 @@ public class UAVAgent extends BaseAircraftAgent {
 			Object obj = objIterator.next();
 			if (obj instanceof AirspaceAgent) {
 				AirspaceAgent airspaceAgent = (AirspaceAgent) obj;
+				// Check that airspace is at the same altitude as us
+				// otherwise it is not an obstacle
+				if(!airspaceAgent.isAtAltitude(this.targetAltitude)) continue;
 				// Check if agent allowed into airspace class
 				// add it as an obstacle if not allowed into it
 				if (!PERMISSABLE_AIRSPACE_CLASSES.contains(airspaceAgent.getAirspaceClass())) {

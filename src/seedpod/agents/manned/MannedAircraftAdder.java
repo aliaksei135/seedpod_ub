@@ -21,13 +21,10 @@ public class MannedAircraftAdder extends BaseGISAdder {
 	public void add(Geography<Object> projection, Object object) {
 
 		int originIndex = RandomHelper.nextIntFromTo(0, aerodromePoints.size());
-		int destinationIndex = RandomHelper.nextIntFromTo(0, aerodromePoints.size());
-		while (originIndex == destinationIndex) {
-			destinationIndex = RandomHelper.nextIntFromTo(0, aerodromePoints.size());
-		}
-
 		Geometry origin = this.aerodromePoints.get(originIndex);
-		Coordinate destination = this.aerodromePoints.get(destinationIndex).getCoordinate();
+		
+		int destinationIndex = RandomHelper.nextIntFromTo(0, NavFixes.DepartureArrivalFixes.values().length-1);
+		Coordinate destination = NavFixes.DepartureArrivalFixes.values()[destinationIndex].getCoordinate();
 
 		MannedAircraftAgent agent = (MannedAircraftAgent) object;
 		agent.setDestination(destination);

@@ -13,6 +13,7 @@ import repast.simphony.parameter.Parameters;
 import seedpod.agents.BaseAircraftAgent;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.constants.EAirspaceClass;
+import static seedpod.constants.Constants.*;
 
 public class MannedAircraftAgent extends BaseAircraftAgent {
 
@@ -39,21 +40,35 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 	public void setup() {
 		super.setup();
 
-		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
-		// This assumes points are close together and far from poles
-		double destinationDelY = this.destination.y - this.currentPosition.y;
-		double destinationDelX = Math.cos(Math.PI / 180 * this.currentPosition.y)
-				* (this.destination.x - this.currentPosition.x);
-		double angleRad = Math.atan2(destinationDelY, destinationDelX);
-		this.flightpathBearing = 2 * Math.PI - (angleRad - Math.PI / 2);
-		this.flightpathBearing %= 2 * Math.PI;
+//		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
+//		// This assumes points are close together and far from poles
+//		double destinationDelY = this.destination.y - this.currentPosition.y;
+//		double destinationDelX = Math.cos(Math.PI / 180 * this.currentPosition.y)
+//				* (this.destination.x - this.currentPosition.x);
+//		double angleRad = Math.atan2(destinationDelY, destinationDelX);
+//		this.flightpathBearing = 2 * Math.PI - (angleRad - Math.PI / 2);
+//		this.flightpathBearing %= 2 * Math.PI;
+//
+//		Parameters p = RunEnvironment.getInstance().getParameters();
+//		if (this.flightpathBearing < Math.PI) {
+//			this.targetAltitude = p.getDouble("Manned_EastTargetAltitudeM");
+//		} else {
+//			this.targetAltitude = p.getDouble("Manned_WestTargetAltitudeM");
+//		}
+		
+		// Assume all manned aircraft will climb above ceiling for now
+		//TODO differentiate between GA and Commercial tfc
+		this.targetAltitude = 1828.8; //6000ft
+	}
+	
+	
 
-		Parameters p = RunEnvironment.getInstance().getParameters();
-		if (this.flightpathBearing < Math.PI) {
-			this.targetAltitude = p.getDouble("Manned_EastTargetAltitudeM");
-		} else {
-			this.targetAltitude = p.getDouble("Manned_WestTargetAltitudeM");
-		}
+	@Override
+	public void fly() {
+		super.fly();
+		
+		//When a/c climbs above ceiling remove it
+		if(this.currentAltitude > CEILING_FT) destroy();
 	}
 
 	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",

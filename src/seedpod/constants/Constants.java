@@ -13,6 +13,13 @@ public final class Constants {
 															// makes agent move directly away from conflicting agent.
 															// 1.0 makes agent move along previous flightpath bearing
 	
+	/* Set sim area limits */
+	public static final double MAX_LAT = 51.3;
+	public static final double MIN_LAT = 50.5;
+	public static final double MAX_LON = -0.2;
+	public static final double MIN_LON = -2.6;
+	public static final double CEILING_FT = 5500;
+	
 	/* Airspace Colouring */
 	public static final Map<EAirspaceClass, Color> AIRSPACE_COLOUR_MAP = Map.of(
 			EAirspaceClass.DANGER, Color.RED,

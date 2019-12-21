@@ -1,22 +1,26 @@
 package seedpod.agents;
 
-import static seedpod.constants.Constants.AVOIDANCE_MOMENTUM;
-import static seedpod.constants.Constants.ORIGIN_RSIVA_TICKS;
-import static seedpod.constants.Constants.SIM_TICK_SECS;
-import static seedpod.constants.Constants.WAYPOINT_BOUNDARY;
+import static seedpod.constants.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dongbat.walkable.FloatArray;
+import com.dongbat.walkable.PathHelper;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
+import gov.nasa.worldwind.geom.LatLon;
 import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.space.gis.GISNetworkListener;
 import repast.simphony.space.gis.Geography;
+import repast.simphony.space.graph.Network;
+import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.meta.AirproxMarker;
+import seedpod.agents.meta.RouteMarker;
 
 public abstract class BaseAircraftAgent {
 
@@ -44,6 +48,8 @@ public abstract class BaseAircraftAgent {
 	/* Simulation-related fields */
 	protected Context context;
 	protected Geography geography;
+	private Network routeNetwork;
+	private RouteMarker previousRouteMarker;
 	private int simTickLife = 0;
 
 	public BaseAircraftAgent() {
@@ -54,6 +60,9 @@ public abstract class BaseAircraftAgent {
 	public void setup() {
 		this.context = ContextUtils.getContext(this);
 		this.geography = (Geography) context.getProjection("airspace_geo");
+		this.routeNetwork = (Network) context.getProjection("routes");
+		this.previousRouteMarker = new RouteMarker(this.currentPosition);
+		this.context.add(this.previousRouteMarker);
 	}
 
 	@ScheduledMethod(start = 1, interval = 1)
@@ -66,6 +75,10 @@ public abstract class BaseAircraftAgent {
 		}
 
 		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
+		
+		if(this.simTickLife % 5 == 0) {
+			dropRouteMarker();
+		}
 
 		// Replan path if not on it
 		if (!onPath)
@@ -165,7 +178,15 @@ public abstract class BaseAircraftAgent {
 		AirproxMarker marker = new AirproxMarker(this.currentPosition);
 		this.context.add(marker);
 		Geometry currentPos = this.geography.getGeometry(this);
-		((Geography) this.context.getProjection("airspace_geo")).move(marker, currentPos);
+		this.geography.move(marker, currentPos);
+	}
+	
+	public void dropRouteMarker() {
+		RouteMarker marker = new RouteMarker(this.currentPosition);
+		this.context.add(marker);
+		RepastEdge edge = new RepastEdge(this.previousRouteMarker, marker, true);
+		this.routeNetwork.addEdge(edge);
+		this.geography.move(marker, this.geography.getGeometry(this));
 	}
 
 	public abstract List<AirspaceAgent> getAirspaceObstacles();
@@ -176,27 +197,31 @@ public abstract class BaseAircraftAgent {
 
 		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
 
-//		PathHelper pathHelper = new PathHelper(180, 90);
-//		
-//		obstaclesList.parallelStream().forEach(obstacle -> {
-//			List<LatLon> coords = obstacle.getLocations();
-//			float[] coordArray = new float[coords.size()*2];
-//			for(int i=0;i<coords.size();i++) {
-//				coordArray[2*i] = (float) coords.get(i).getLongitude().getDegrees();
-//				coordArray[(2*i)+1] = (float) coords.get(i).getLatitude().getDegrees();
-//			}
-//			pathHelper.addPolygon(coordArray);
-//		});
-//		
-//		FloatArray path = new FloatArray();
-//		pathHelper.findPath((float)this.currentPosition.x, (float)this.currentPosition.y,
-//				(float)this.destination.x, (float)this.destination.y,
-//				0, path);
-//		
-//		for(int i=0;i<path.size/2;i++) {
-//			Coordinate coord = new Coordinate((double)path.items[2*i], path.items[(2*i)+1]);
-//			this.pathCoords.add(coord);
-//		}
+		PathHelper pathHelper = new PathHelper((float)Math.abs(MAX_LON-MIN_LON), (float)Math.abs(MAX_LAT-MIN_LAT));
+		
+		for(AirspaceAgent obstacle : obstaclesList){
+			List<LatLon> coords = obstacle.getLocations();
+			float[] coordArray = new float[coords.size()*2];
+			for(int i=0;i<coords.size();i++) {
+				coordArray[2*i] = (float) (coords.get(i).getLongitude().getDegrees()-MIN_LON);
+				coordArray[(2*i)+1] = (float) (coords.get(i).getLatitude().getDegrees()-MIN_LAT);
+			}
+			try {
+				pathHelper.addPolygon(coordArray);
+			}catch (Exception e) {
+				continue;
+			}
+		}
+		
+		FloatArray path = new FloatArray();
+		pathHelper.findPath((float)(this.currentPosition.x-MIN_LON), (float)(this.currentPosition.y-MIN_LAT),
+				(float)(this.destination.x-MIN_LON), (float)(this.destination.y-MIN_LAT),
+				1e-7f, path);
+		
+		for(int i=0;i<path.size/2;i++) {
+			Coordinate coord = new Coordinate(path.items[2*i]+MIN_LON, path.items[(2*i)+1]+MIN_LAT);
+			this.pathCoords.add(coord);
+		}
 
 		// Add destination point on end
 		this.pathCoords.add(this.destination);

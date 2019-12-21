@@ -38,5 +38,10 @@ public class AirspaceAgent extends Polygon {
 		}
 		this.setLocations(latLons);
 	}
+	
+	public boolean isAtAltitude(double altitude) {
+		return altitude <= this.upperAltitude
+				&& altitude >= this.lowerAltitude;
+	}
 
 }

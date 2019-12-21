@@ -3,16 +3,16 @@
   <type>GIS 3D</type>
   <styles>
     <entry>
-      <string>seedpod.agents.meta.AirproxMarker</string>
-      <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
-    </entry>
-    <entry>
       <string>seedpod.agents.ground.AerodromeAgent</string>
       <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
     </entry>
     <entry>
       <string>seedpod.agents.airspace.AirspaceAgent</string>
       <string>seedpod.styles.Airspace3DStyle</string>
+    </entry>
+    <entry>
+      <string>seedpod.agents.meta.AirproxMarker</string>
+      <string>repast.simphony.visualization.gis3D.style.EditedMarkStyle</string>
     </entry>
     <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
@@ -25,16 +25,16 @@
   </styles>
   <editedStyles>
     <entry>
-      <string>seedpod.agents.meta.AirproxMarker</string>
-      <string>seedpod.agents.meta.Marker.style_4.xml</string>
-    </entry>
-    <entry>
       <string>seedpod.agents.ground.AerodromeAgent</string>
       <string>seedpod.agents.ground.AerodromeAgent.style_4.xml</string>
     </entry>
     <entry>
       <string>seedpod.agents.airspace.AirspaceAgent</string>
       <string>seedpod.agents.airspace.AirspaceAgent.style_3.xml</string>
+    </entry>
+    <entry>
+      <string>seedpod.agents.meta.AirproxMarker</string>
+      <string>seedpod.agents.meta.Marker.style_4.xml</string>
     </entry>
     <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
@@ -45,8 +45,18 @@
       <string>seedpod.agents.unmanned.UAVAgent.style_2.xml</string>
     </entry>
   </editedStyles>
-  <netStyles/>
-  <editedNetStyles/>
+  <netStyles>
+    <entry>
+      <string>routes</string>
+      <string>repast.simphony.visualization.gis3D.style.DefaultNetworkStyleGIS</string>
+    </entry>
+  </netStyles>
+  <editedNetStyles>
+    <entry>
+      <string>routes</string>
+      <null/>
+    </entry>
+  </editedNetStyles>
   <frequency>ON_NEW</frequency>
   <schedParams>
     <start>1.0</start>
@@ -55,29 +65,33 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-1108765055</hashCode>
+    <hashCode>942725657</hashCode>
   </schedParams>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>seedpod.agents.meta.AirproxMarker</string>
-      <int>0</int>
-    </entry>
-    <entry>
       <string>seedpod.agents.ground.AerodromeAgent</string>
-      <int>2</int>
+      <int>3</int>
     </entry>
     <entry>
       <string>seedpod.agents.airspace.AirspaceAgent</string>
       <int>1</int>
     </entry>
     <entry>
+      <string>seedpod.agents.meta.AirproxMarker</string>
+      <int>4</int>
+    </entry>
+    <entry>
       <string>seedpod.agents.ground.HospitalAgent</string>
-      <int>3</int>
+      <int>2</int>
     </entry>
     <entry>
       <string>seedpod.agents.unmanned.UAVAgent</string>
-      <int>4</int>
+      <int>5</int>
+    </entry>
+    <entry>
+      <string>i-cubed Landsat</string>
+      <int>0</int>
     </entry>
   </layerOrder>
   <projections>
@@ -86,8 +100,20 @@
       <attributes/>
       <type>geography</type>
     </repast.simphony.scenario.data.ProjectionData>
+    <repast.simphony.scenario.data.ProjectionData>
+      <id>routes</id>
+      <attributes/>
+      <type>network</type>
+    </repast.simphony.scenario.data.ProjectionData>
   </projections>
   <projectionDescriptors>
+    <entry>
+      <string>routes</string>
+      <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
+        <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[2]"/>
+        <props/>
+      </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
+    </entry>
     <entry>
       <string>airspace_geo</string>
       <repast.simphony.visualization.gis.GisProjectionDescriptor>

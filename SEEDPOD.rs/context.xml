@@ -3,6 +3,6 @@
 	xsi:noNamespaceSchemaLocation="http://repast.org/scenario/context">
 
 	<projection type="geography" id="airspace_geo"></projection>
-	<!-- <projection type="geography" id="meta_geo"></projection> -->
+	<projection type="network" id="routes"></projection>
 
 </context>
