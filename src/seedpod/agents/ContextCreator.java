@@ -62,17 +62,12 @@ public class ContextCreator implements ContextBuilder<Object> {
 		GeometryFactory geometryFactory = new GeometryFactory();
 //		new GISNetworkListener(context, airspaceGeography, routeNetwork);
 
-		List<Geometry> aerodromes = loadGroundFeatures(AERODROME_SHAPEFILE, context, airspaceGeography,
+		List<BaseGroundAgent> aerodromes = loadGroundFeatures(AERODROME_SHAPEFILE, context, airspaceGeography,
 				AerodromeAgent.class);
-		List<Geometry> hospitals = loadGroundFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography,
+		List<BaseGroundAgent> hospitals = loadGroundFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography,
 				HospitalAgent.class);
-		List<Geometry> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
+		List<AirspaceAgent> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
 
-//		List<Geometry> airspace = new ArrayList<>();
-//		for(int i=0;i<EAirspaceClass.values().length;i++) {
-//			System.out.println("Loading " + EAirspaceClass.values()[i]);
-//			airspace.addAll(loadAirspaceFeatures(Filepaths.AIRSPACE_PATH_STRINGS[i], context, airspaceGeography, AirspaceAgent.class, EAirspaceClass.values()[i]));
-//		}
 
 		int mannedACCount = 5;
 		Adder mannedAdder = new MannedAircraftAdder(aerodromes);
@@ -93,7 +88,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 		return context;
 	}
 
-	private List<SimpleFeature> loadFeaturesFromShapefile(String filename) {
+	private static List<SimpleFeature> loadFeaturesFromShapefile(String filename) {
 		URL url = null;
 		try {
 			url = new File(filename).toURI().toURL();
@@ -134,14 +129,13 @@ public class ContextCreator implements ContextBuilder<Object> {
 	 * @param filename   the name of the shapefile from which to load agents
 	 * @param context    the context
 	 * @param geography  the geography
-	 * @param agentClass class of agent to create
 	 */
-	private List<Geometry> loadGroundFeatures(String filename, Context context, Geography geography,
+	private static List<BaseGroundAgent> loadGroundFeatures(String filename, Context context, Geography geography,
 			Class<? extends BaseGroundAgent> agentClass) {
 
 		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
 
-		List<Geometry> geometries = new ArrayList<>();
+		List<BaseGroundAgent> agents = new ArrayList<>();
 
 		// For each feature in the file
 		for (SimpleFeature feature : features) {
@@ -172,7 +166,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 					boolean isEmergency = "yes".equals(((String) feature.getAttribute("emergency")).toLowerCase());
 					((HospitalAgent) agent).setEmergency(isEmergency);
 				}
-				geometries.add(geom);
+				agents.add(agent);
 			}
 
 			if (agent != null) {
@@ -183,14 +177,14 @@ public class ContextCreator implements ContextBuilder<Object> {
 			}
 		}
 
-		return geometries;
+		return agents;
 	}
 
-	private List<Geometry> loadAirspaceFeatures(String filename, Context context, Geography geography) {
+	private static List<AirspaceAgent> loadAirspaceFeatures(String filename, Context context, Geography geography) {
 
 		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
 
-		List<Geometry> geometries = new ArrayList<>();
+		List<AirspaceAgent> agents = new ArrayList<>();
 
 		// For each feature in the file
 		for (SimpleFeature feature : features) {
@@ -229,7 +223,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 				agent.setAirspaceClass(airspaceClass);
 				agent.setAltitudes(baseM, ceilingM);
 				agent.setCoords(geom.getCoordinates());
-				geometries.add(geom);
+				agents.add(agent);
 
 				context.add(agent);
 				geography.move(agent, geom);
@@ -237,49 +231,6 @@ public class ContextCreator implements ContextBuilder<Object> {
 
 		}
 
-		return geometries;
+		return agents;
 	}
-
-//	private List<Geometry> loadAirspaceFeatures(String filename, Context context, Geography geography, Class<? extends AirspaceAgent> agentClass, EAirspaceClass airspaceClass){
-//
-//		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
-//		
-//		List<Geometry> geometries = new ArrayList<>();
-//		
-//		// For each feature in the file
-//		for (SimpleFeature feature : features){
-//			Geometry geom = (Geometry)feature.getDefaultGeometry();
-//			AirspaceAgent agent = null;
-//
-//			if (!geom.isValid()){
-//				System.out.println("Invalid geometry: " + feature.getID());
-//			}
-//			
-//			if (geom instanceof MultiPolygon){
-//				MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometry();
-//				geom = (Polygon)mp.getGeometryN(0);				
-//
-//				try {
-//					agent = agentClass.getDeclaredConstructor().newInstance();
-//				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-//						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-//					e.printStackTrace();
-//				}
-//				agent.setAirspaceClass(airspaceClass);
-//				agent.setPolygon(geom);
-//				geometries.add(geom);
-//			}
-//
-//			if (agent != null){
-//				context.add(agent);
-//				geography.move(agent, geom);
-//			}
-//			else{
-//				System.out.println("Error creating agent for  " + geom);
-//			}
-//		}
-//		
-//		return geometries;
-//	}
-
 }

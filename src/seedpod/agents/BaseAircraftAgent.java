@@ -209,7 +209,7 @@ public abstract class BaseAircraftAgent {
 			try {
 				pathHelper.addPolygon(coordArray);
 			}catch (Exception e) {
-				continue;
+				
 			}
 		}
 		
