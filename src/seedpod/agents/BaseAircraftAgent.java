@@ -1,19 +1,20 @@
 package seedpod.agents;
 
-import static seedpod.constants.Constants.*;
+import static seedpod.constants.Constants.AVOIDANCE_MOMENTUM;
+import static seedpod.constants.Constants.ORIGIN_RSIVA_TICKS;
+import static seedpod.constants.Constants.SIM_TICK_SECS;
+import static seedpod.constants.Constants.WAYPOINT_BOUNDARY;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dongbat.walkable.FloatArray;
-import com.dongbat.walkable.PathHelper;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import gov.nasa.worldwind.geom.LatLon;
 import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
-import repast.simphony.space.gis.GISNetworkListener;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.graph.RepastEdge;
@@ -21,6 +22,12 @@ import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.meta.AirproxMarker;
 import seedpod.agents.meta.RouteMarker;
+import straightedge.geom.KPoint;
+import straightedge.geom.KPolygon;
+import straightedge.geom.path.NodeConnector;
+import straightedge.geom.path.PathBlockingObstacleImpl;
+import straightedge.geom.path.PathData;
+import straightedge.geom.path.PathFinder;
 
 public abstract class BaseAircraftAgent {
 
@@ -128,7 +135,7 @@ public abstract class BaseAircraftAgent {
 		this.geography.moveByVector(this, this.lateralMaxSpeedMPS * SIM_TICK_SECS, angleRad);
 		this.currentAltitude += dz;
 
-		airborne = true;
+		this.airborne = true;
 		this.simTickLife++;
 	}
 
@@ -195,44 +202,36 @@ public abstract class BaseAircraftAgent {
 		System.out.println("Planning path");
 		this.pathCoords.clear();
 
-		List<AirspaceAgent> obstaclesList = getAirspaceObstacles();
-
-		PathHelper pathHelper = new PathHelper((float)Math.abs(MAX_LON-MIN_LON), (float)Math.abs(MAX_LAT-MIN_LAT));
+		List<AirspaceAgent> obstacleAgents = getAirspaceObstacles();
+		ArrayList<PathBlockingObstacleImpl> polygonObstacles = new ArrayList<>();
+		GeometryFactory factory = new GeometryFactory();
 		
-		for(AirspaceAgent obstacle : obstaclesList){
-			List<LatLon> coords = obstacle.getLocations();
-			float[] coordArray = new float[coords.size()*2];
-			for(int i=0;i<coords.size();i++) {
-				coordArray[2*i] = (float) (coords.get(i).getLongitude().getDegrees()-MIN_LON);
-				coordArray[(2*i)+1] = (float) (coords.get(i).getLatitude().getDegrees()-MIN_LAT);
+		for(AirspaceAgent obstacleAgent : obstacleAgents) {
+			ArrayList<KPoint> points = new ArrayList<>();
+			for(LatLon pointLatLon : obstacleAgent.getLocations()) {
+				points.add(new KPoint(pointLatLon.longitude.getDegrees(), pointLatLon.latitude.getDegrees()));
 			}
-			try {
-				pathHelper.addPolygon(coordArray);
-			}catch (Exception e) {
-				
-			}
+			KPolygon poly = new KPolygon(points);
+			polygonObstacles.add(PathBlockingObstacleImpl.createObstacleFromInnerPolygon(poly));
 		}
 		
-		FloatArray path = new FloatArray();
-		pathHelper.findPath((float)(this.currentPosition.x-MIN_LON), (float)(this.currentPosition.y-MIN_LAT),
-				(float)(this.destination.x-MIN_LON), (float)(this.destination.y-MIN_LAT),
-				1e-7f, path);
+		NodeConnector nodeConnector = new NodeConnector();
+		// Do not connect nodes further apart than this in the Navmesh
+		double maxNodeConnectionDistanceDeg = 0.1; // ~11km //TODO Play with this value
+		for(PathBlockingObstacleImpl obstacle : polygonObstacles) {
+			nodeConnector.addObstacle(obstacle, polygonObstacles, maxNodeConnectionDistanceDeg);
+		}
 		
-		for(int i=0;i<path.size/2;i++) {
-			Coordinate coord = new Coordinate(path.items[2*i]+MIN_LON, path.items[(2*i)+1]+MIN_LAT);
-			this.pathCoords.add(coord);
+		PathFinder pathFinder = new PathFinder();
+		KPoint startPoint = new KPoint(this.currentPosition.x, this.currentPosition.y);
+		KPoint endPoint = new KPoint(this.destination.x, this.destination.y);
+		PathData pathData = pathFinder.calc(startPoint, endPoint, maxNodeConnectionDistanceDeg, nodeConnector, polygonObstacles);
+
+		for(KPoint point : pathData.getPoints()) {
+			this.pathCoords.add(new Coordinate(point.x, point.y));
 		}
+		this.pathCoords.remove(0); //Remove the current position
 
-		// Add destination point on end
-		this.pathCoords.add(this.destination);
-
-		// Reset index for new path
-		this.pathIndex = 0;
-		this.onPath = true;
-
-		if (this.pathCoords.size() <= 1) {
-			this.nextPointDestination = true;
-		}
 	}
 
 	public void destroy() {
