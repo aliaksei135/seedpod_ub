@@ -214,10 +214,10 @@ public abstract class BaseAircraftAgent {
 			KPolygon poly = new KPolygon(points);
 			polygonObstacles.add(PathBlockingObstacleImpl.createObstacleFromInnerPolygon(poly));
 		}
-		
+				
 		NodeConnector nodeConnector = new NodeConnector();
 		// Do not connect nodes further apart than this in the Navmesh
-		double maxNodeConnectionDistanceDeg = 0.1; // ~11km //TODO Play with this value
+		double maxNodeConnectionDistanceDeg = 0.2; // ~22km //TODO Play with this value
 		for(PathBlockingObstacleImpl obstacle : polygonObstacles) {
 			nodeConnector.addObstacle(obstacle, polygonObstacles, maxNodeConnectionDistanceDeg);
 		}
@@ -230,7 +230,14 @@ public abstract class BaseAircraftAgent {
 		for(KPoint point : pathData.getPoints()) {
 			this.pathCoords.add(new Coordinate(point.x, point.y));
 		}
-		this.pathCoords.remove(0); //Remove the current position
+
+		this.pathIndex = 0;
+		if(this.pathCoords.size() < 2) {
+			this.pathCoords.clear();
+			this.pathCoords.add(this.destination);
+		} else {
+			this.pathCoords.remove(0); //Remove current position
+		}
 
 	}
 

@@ -1,4 +1,4 @@
-package seedpod.agents;
+package seedpod.styles;
 
 import repast.simphony.space.graph.RepastEdge;
 

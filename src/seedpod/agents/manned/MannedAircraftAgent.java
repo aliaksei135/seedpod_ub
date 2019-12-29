@@ -75,7 +75,7 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 			watcheeFieldNames = "airborne", //Ignore if not airborne
 			query = "within " + REQ_LATERAL_SEP_M + " 'airspace_geo'",
 			scheduleTriggerPriority = ScheduleParameters.FIRST_PRIORITY,
-			triggerCondition = "$watcher.airborne",
+//			triggerCondition = "$watcher.airborne",
 			shuffle = false,
 			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
 	@Override
