@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static seedpod.constants.Constants.MESH_LAYER_SPACING_M;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -67,14 +69,14 @@ public class PathFinderFactory {
 		
 		Pair<NodeConnector, ArrayList<PathBlockingObstacleImpl>> navPair = Pair.of(nodeConnector, polygonObstacles);
 		
-		double roundedAlt = Math.ceil(altitude/304.8)*304.8;
+		double roundedAlt = Math.ceil(altitude/MESH_LAYER_SPACING_M)*MESH_LAYER_SPACING_M;
 		this.cache.put(roundedAlt, new SoftReference<>(navPair));
 		
 		return navPair;
 	}
 
 	private Pair<NodeConnector, ArrayList<PathBlockingObstacleImpl>> returnFromCacheOrNull(Double altitude) {
-		double roundedAlt = Math.ceil(altitude/152.4)*152.4; //Ceiling-round to nearest 500ft
+		double roundedAlt = Math.ceil(altitude/MESH_LAYER_SPACING_M)*MESH_LAYER_SPACING_M; //Ceiling-round to nearest 500ft
 
 		return this.cache.containsKey(roundedAlt) ? this.cache.get(roundedAlt).get() : null;
 	}

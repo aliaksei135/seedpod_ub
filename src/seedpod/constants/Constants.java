@@ -13,6 +13,8 @@ public final class Constants {
 															// makes agent move directly away from conflicting agent.
 															// 1.0 makes agent move along previous flightpath bearing
 	
+	public static final double MESH_LAYER_SPACING_M = 152.4; // Vertical spacing between airspace navmesh layers in metres
+	
 	/* Set sim area limits */
 	public static final double MAX_LAT = 51.3;
 	public static final double MIN_LAT = 50.5;

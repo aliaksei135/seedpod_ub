@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 import repast.simphony.context.Context;
@@ -147,28 +148,42 @@ public class ContextCreator implements ContextBuilder<Object> {
 				System.out.println("Invalid geometry: " + feature.getID());
 			}
 
+			Coordinate centroidCoordinate = null;
 			if (geom instanceof MultiPolygon) {
 				MultiPolygon mp = (MultiPolygon) feature.getDefaultGeometry();
 				geom = mp.getGeometryN(0);
-
-				// Read the feature attributes
-				String name = (String) feature.getAttribute("name");
-
-				try {
-					agent = agentClass.getDeclaredConstructor().newInstance();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
-				}
-				agent.setReadableName(name);
-				agent.setId(UUID.randomUUID().toString());
-				agent.setGeometry(geom);
-				if (agent instanceof HospitalAgent) {
-					boolean isEmergency = "yes".equals(((String) feature.getAttribute("emergency")).toLowerCase());
-					((HospitalAgent) agent).setEmergency(isEmergency);
-				}
-				agents.add(agent);
+				centroidCoordinate = geom.getCoordinate();
+			} else if (geom instanceof Point) {
+				centroidCoordinate = geom.getCoordinate();
 			}
+			
+			if(centroidCoordinate == null) continue;
+				
+			//Check if centroid within sim areas bounds
+			if(centroidCoordinate.x > MAX_LON 
+					|| centroidCoordinate.x < MIN_LON
+					|| centroidCoordinate.y > MAX_LAT
+					|| centroidCoordinate.y < MIN_LAT) {
+				continue;
+			}
+
+			// Read the feature attributes
+			String name = (String) feature.getAttribute("name");
+
+			try {
+				agent = agentClass.getDeclaredConstructor().newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				e.printStackTrace();
+			}
+			agent.setReadableName(name);
+			agent.setId(UUID.randomUUID().toString());
+			agent.setGeometry(geom);
+			if (agent instanceof HospitalAgent) {
+				boolean isEmergency = "yes".equals(((String) feature.getAttribute("emergency")).toLowerCase());
+				((HospitalAgent) agent).setEmergency(isEmergency);
+			}
+			agents.add(agent);
 
 			if (agent != null) {
 				context.add(agent);

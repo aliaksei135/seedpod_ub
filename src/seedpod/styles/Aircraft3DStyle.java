@@ -32,4 +32,6 @@ public class Aircraft3DStyle extends EditedMarkStyle {
 
 		return mark;
 	}
+	
+	
 }

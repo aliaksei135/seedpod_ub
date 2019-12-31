@@ -3,7 +3,7 @@ package seedpod.constants;
 public final class Filepaths {
 
 	public static final String HOSPITAL_SHAPEFILE = "data/hospitals.shp";
-	public static final String AERODROME_SHAPEFILE = "data/aerodrome.shp";
+	public static final String AERODROME_SHAPEFILE = "data/aerodrome_centroid.shp";
 	public static final String AIRSPACE_SHAPEFILE = "data/airspace.shp";
 
 //	public static final String AIRSPACE_CLASS_A_SHAPEFILE = "data/airspace/A/CLASS A.shp";

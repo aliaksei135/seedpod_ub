@@ -141,12 +141,13 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 		if (conflictingAgent.hashCode() == this.hashCode())
 			return;
 		
+		// Check if just departing
+		if (this.simTickLife <= ORIGIN_RSIVA_TICKS) return;
+		
 		// Check for vertical separation
 		double verticalSep = Math.abs(this.currentAltitude - conflictingAgent.currentAltitude);
 		if(verticalSep > this.requiredVerticalSeparationM) return;
 		
-		// Check if just departing
-		if (this.simTickLife <= ORIGIN_RSIVA_TICKS) return;
 
 		// Try not to calculate distance where possible
 		if (this.nextPointDestination) {
