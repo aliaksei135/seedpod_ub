@@ -32,7 +32,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	protected Coordinate currentPosition;
 	protected double currentAltitude;
 	protected Coordinate nextPoint;
-	protected double flightpathBearing;
+	protected double flightpathBearing; // in radians!
 	protected ArrayList<Coordinate> pathCoords;
 
 	/* Agent state fields */
@@ -112,7 +112,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 		if (angleRad < 0) {
 			angleRad = angleRad + 2 * Math.PI;
 		}
-		// angleRad uses angles from a standard set of x-y axes to +90deg would be North
+		// angleRad uses angles from a standard set of x-y axes so +90deg would be North
 		// and -90deg would be South
 		// rotate this to get the bearing from North
 		this.flightpathBearing = 2.5 * Math.PI - angleRad;

@@ -2,7 +2,7 @@ package seedpod.agents.meta;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public abstract class BaseMarker {
+public abstract class BaseMarker{
 
 	Coordinate coordinate;
 
@@ -15,4 +15,5 @@ public abstract class BaseMarker {
 		return coordinate;
 	}
 
+	
 }

@@ -1,16 +1,18 @@
 package seedpod.agents;
 
+import static seedpod.constants.Constants.MAX_LAT;
+import static seedpod.constants.Constants.MAX_LON;
+import static seedpod.constants.Constants.MIN_LAT;
+import static seedpod.constants.Constants.MIN_LON;
 import static seedpod.constants.Filepaths.AERODROME_SHAPEFILE;
 import static seedpod.constants.Filepaths.AIRSPACE_SHAPEFILE;
 import static seedpod.constants.Filepaths.HOSPITAL_SHAPEFILE;
-import static seedpod.constants.Constants.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,14 +26,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
-import repast.simphony.space.gis.GISNetworkListener;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
 import repast.simphony.space.graph.Network;
@@ -42,6 +42,9 @@ import seedpod.agents.ground.BaseGroundAgent;
 import seedpod.agents.ground.HospitalAgent;
 import seedpod.agents.manned.MannedAircraftAdder;
 import seedpod.agents.manned.MannedAircraftAgent;
+import seedpod.agents.manned.NavFixes;
+import seedpod.agents.manned.NavFixes.DepartureArrivalFixes;
+import seedpod.agents.meta.NavFixMarker;
 import seedpod.agents.unmanned.UAVAdder;
 import seedpod.agents.unmanned.UAVAgent;
 import seedpod.constants.EAirspaceClass;
@@ -70,21 +73,26 @@ public class ContextCreator implements ContextBuilder<Object> {
 				HospitalAgent.class);
 		List<AirspaceAgent> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
 
-
+		// Add entry/exit NavFixes
+		for(DepartureArrivalFixes nf : NavFixes.DepartureArrivalFixes.values()) {
+			context.add(new NavFixMarker(nf.getCoordinate()));
+		}
+		
+		// Add agents
 		int mannedACCount = 5;
 		Adder mannedAdder = new MannedAircraftAdder(aerodromes);
 		for(int i=0;i<mannedACCount;i++) {
 			MannedAircraftAgent agent = new MannedAircraftAgent();
-			context.add((BaseAircraftAgent)agent);
-			mannedAdder.add(airspaceGeography, (BaseAircraftAgent)agent);
+			context.add(agent);
+			mannedAdder.add(airspaceGeography, agent);
 		}
 
 		int uavCount = 30;
 		Adder uavAdder = new UAVAdder(hospitals);
 		for (int i = 0; i < uavCount; i++) {
 			UAVAgent agent = new UAVAgent();
-			context.add((BaseAircraftAgent)agent);
-			uavAdder.add(airspaceGeography, (BaseAircraftAgent)agent);
+			context.add(agent);
+			uavAdder.add(airspaceGeography, agent);
 		}
 
 		return context;

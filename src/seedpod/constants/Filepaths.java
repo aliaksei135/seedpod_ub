@@ -5,6 +5,11 @@ public final class Filepaths {
 	public static final String HOSPITAL_SHAPEFILE = "data/hospitals.shp";
 	public static final String AERODROME_SHAPEFILE = "data/aerodrome_centroid.shp";
 	public static final String AIRSPACE_SHAPEFILE = "data/airspace.shp";
+	
+	public static final String MANNED_ICON = "icons/aircraft.png";
+	public static final String UAV_ICON = "icons/drone.png";
+	public static final String AERODROME_ICON = "icons/aerodrome.png";
+	public static final String HOSPITAL_ICON = "icons/hospital.png";
 
 //	public static final String AIRSPACE_CLASS_A_SHAPEFILE = "data/airspace/A/CLASS A.shp";
 //	public static final String AIRSPACE_CLASS_C_SHAPEFILE = "data/airspace/C/CLASS C.shp";
