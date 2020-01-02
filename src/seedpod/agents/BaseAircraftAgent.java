@@ -93,9 +93,11 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 		// This assumes points are close together and far from poles
 		double dy = nextPoint.y - this.currentPosition.y;
 		double dx = Math.cos(Math.PI / 180 * this.currentPosition.y) * (nextPoint.x - this.currentPosition.x);
-		double dist = Math.sqrt(dy * dy + dx * dx);
+		double waypointDist = Math.sqrt(dy * dy + dx * dx);
+		
+		double moveDist = this.lateralMaxSpeedMPS * SIM_TICK_SECS;
 
-		if (dist < WAYPOINT_BOUNDARY) {
+		if (waypointDist <= WAYPOINT_BOUNDARY) {			
 			if (this.nextPointDestination) {
 				// Check if at final destination, if so destroy agent
 				destroy();
@@ -105,6 +107,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 				if (this.pathCoords.size() - 2 == this.pathIndex) {
 					this.nextPointDestination = true;
 				}
+				moveDist = waypointDist; //Assume moveDist is always greater than WAYPOINT_BOUNDARY
 			}
 		}
 
@@ -129,7 +132,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 			}
 		}
 
-		this.geography.moveByVector(this, this.lateralMaxSpeedMPS * SIM_TICK_SECS, angleRad);
+		this.geography.moveByVector(this, moveDist, angleRad);
 		this.currentAltitude += dz;
 
 		this.airborne = true;
@@ -155,7 +158,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 			double dx = Math.cos(Math.PI / 180 * this.currentPosition.y)
 					* (this.destination.x - this.currentPosition.x);
 			double dist = Math.sqrt(dy * dy + dx * dx);
-			if (dist < WAYPOINT_BOUNDARY) {
+			if (dist > WAYPOINT_BOUNDARY) {
 				performAvoidanceActions(conflictingAgent);
 			}
 		} else {
@@ -214,9 +217,10 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 		}
 
 		this.pathIndex = 0;
-		if(this.pathCoords.size() < 2) {
+		if(this.pathCoords.size() <= 2) {
 			this.pathCoords.clear();
 			this.pathCoords.add(this.destination);
+			this.nextPointDestination = true;
 		} else {
 			this.pathCoords.remove(0); //Remove current position
 		}

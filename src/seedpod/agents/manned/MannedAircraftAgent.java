@@ -80,7 +80,8 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 			whenToTrigger = WatcherTriggerSchedule.IMMEDIATE )
 	@Override
 	public void onBufferInfringed(BaseAircraftAgent conflictingAgent) {
-		super.onBufferInfringed(conflictingAgent);
+		// Manned Aircraft will have priority
+//		super.onBufferInfringed(conflictingAgent);
 	}
 
 	@Override
