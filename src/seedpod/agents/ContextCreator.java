@@ -56,7 +56,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 		context.setId("SEEDPOD");
 
 		// Create geo projection
-		GeographyParameters<Object> geoParams = new GeographyParameters<Object>();
+		GeographyParameters<Object> geoParams = new GeographyParameters<>();
 		geoParams.getAdder();
 		GeographyFactory geographyFactory = GeographyFactoryFinder.createGeographyFactory(null);
 		Geography<Object> airspaceGeography = geographyFactory.createGeography("airspace_geo", context, geoParams);

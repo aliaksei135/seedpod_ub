@@ -238,6 +238,10 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	public void setDestination(Coordinate destination) {
 		this.destination = destination;
 	}
+	
+	public void setTargetAltitude(double alt) {
+		this.targetAltitude = alt;
+	}
 
 	public double getCurrentAltitude() {
 		return this.currentAltitude;

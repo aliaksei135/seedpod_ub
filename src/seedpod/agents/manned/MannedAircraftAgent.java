@@ -39,26 +39,6 @@ public class MannedAircraftAgent extends BaseAircraftAgent {
 	@ScheduledMethod(start = 0)
 	public void setup() {
 		super.setup();
-
-//		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
-//		// This assumes points are close together and far from poles
-//		double destinationDelY = this.destination.y - this.currentPosition.y;
-//		double destinationDelX = Math.cos(Math.PI / 180 * this.currentPosition.y)
-//				* (this.destination.x - this.currentPosition.x);
-//		double angleRad = Math.atan2(destinationDelY, destinationDelX);
-//		this.flightpathBearing = 2 * Math.PI - (angleRad - Math.PI / 2);
-//		this.flightpathBearing %= 2 * Math.PI;
-//
-//		Parameters p = RunEnvironment.getInstance().getParameters();
-//		if (this.flightpathBearing < Math.PI) {
-//			this.targetAltitude = p.getDouble("Manned_EastTargetAltitudeM");
-//		} else {
-//			this.targetAltitude = p.getDouble("Manned_WestTargetAltitudeM");
-//		}
-		
-		// Assume all manned aircraft will climb above ceiling for now
-		//TODO differentiate between GA and Commercial tfc
-		this.targetAltitude = 1828.8; //6000ft
 	}
 	
 	

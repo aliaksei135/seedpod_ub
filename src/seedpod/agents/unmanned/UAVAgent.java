@@ -33,22 +33,6 @@ public class UAVAgent extends BaseAircraftAgent {
 	@ScheduledMethod(start = 0)
 	public void setup() {
 		super.setup();
-
-		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
-		// This assumes points are close together and far from poles
-		double destinationDelY = this.destination.y - this.currentPosition.y;
-		double destinationDelX = Math.cos(Math.PI / 180 * this.currentPosition.y)
-				* (this.destination.x - this.currentPosition.x);
-		double angleRad = Math.atan2(destinationDelY, destinationDelX);
-		this.flightpathBearing = 2 * Math.PI - (angleRad - Math.PI / 2);
-		this.flightpathBearing %= 2 * Math.PI;
-
-		Parameters p = RunEnvironment.getInstance().getParameters();
-		if (this.flightpathBearing < Math.PI) {
-			this.targetAltitude = p.getDouble("UAV_EastTargetAltitudeM");
-		} else {
-			this.targetAltitude = p.getDouble("UAV_WestTargetAltitudeM");
-		}
 	}
 
 	@Watch(watcheeClassName = "seedpod.agents.BaseAircraftAgent",
