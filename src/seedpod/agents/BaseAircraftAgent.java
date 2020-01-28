@@ -13,6 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import bsh.This;
 import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.graph.Network;
@@ -204,11 +205,12 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	public List<AirspaceAgent> fetchAirspaceObstacles() {
 		return this.getAirspaceObstacles();
 	}
+	
 
 	public void findPath() {
 		this.pathCoords.clear();
 
-		WrappedPathFinder pathFinder = PathFinderFactory.getInstance().getPathFinder(this.currentAltitude, this);
+		WrappedPathFinder pathFinder = PathFinderFactory.getInstance().getPathFinder(this.targetAltitude, this);
 		KPoint startPoint = new KPoint(this.currentPosition.x, this.currentPosition.y);
 		KPoint endPoint = new KPoint(this.destination.x, this.destination.y);
 		PathData pathData = pathFinder.calc(startPoint, endPoint);
@@ -230,6 +232,9 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 
 	public void destroy() {
 		this.context.remove(this);
+		if(this.context.getObjects(BaseAircraftAgent.class).size() < 1) {
+			RunEnvironment.getInstance().endRun();
+		}
 	}
 
 	public Coordinate getDestination() {

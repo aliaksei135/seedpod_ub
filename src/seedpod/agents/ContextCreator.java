@@ -27,11 +27,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
+import gov.nasa.worldwind.render.ShapeAttributes;
+import gov.nasa.worldwind.render.airspaces.AirspaceAttributes;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
 import repast.simphony.space.graph.Network;
@@ -94,6 +97,8 @@ public class ContextCreator implements ContextBuilder<Object> {
 			context.add(agent);
 			uavAdder.add(airspaceGeography, agent);
 		}
+		
+		RunEnvironment.getInstance().endAt(40000);
 
 		return context;
 	}

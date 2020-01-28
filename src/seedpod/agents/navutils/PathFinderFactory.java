@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static seedpod.constants.Constants.MESH_LAYER_SPACING_M;
+import static seedpod.constants.Constants.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -21,6 +21,7 @@ import straightedge.geom.path.NodeConnector;
 import straightedge.geom.path.PathBlockingObstacleImpl;
 
 public class PathFinderFactory {
+	
 	
 	// Map node connectors and their associated obstacles (navPairs) to a 500ft ceiling-rounded altitude
 	private Map<Double, SoftReference<Pair<NodeConnector, ArrayList<PathBlockingObstacleImpl>>>> cache =
@@ -54,17 +55,17 @@ public class PathFinderFactory {
 		for(AirspaceAgent obstacleAgent : obstacleAgents) {
 			ArrayList<KPoint> points = new ArrayList<>();
 			for(LatLon pointLatLon : obstacleAgent.getLocations()) {
-				points.add(new KPoint(pointLatLon.longitude.getDegrees(), pointLatLon.latitude.getDegrees()));
+				points.add(new KPoint(pointLatLon.longitude.getDegrees()*MESH_COORD_SCALE_FACTOR, pointLatLon.latitude.getDegrees()*MESH_COORD_SCALE_FACTOR));
 			}
-			KPolygon poly = new KPolygon(points);
-			polygonObstacles.add(PathBlockingObstacleImpl.createObstacleFromInnerPolygon(poly));
+			KPolygon poly = new KPolygon(points, false);
+			polygonObstacles.add(PathBlockingObstacleImpl.createObstacleFromOuterPolygon(poly));
 		}
 				
 		NodeConnector nodeConnector = new NodeConnector();
 		// Do not connect nodes further apart than this in the Navmesh
-		double maxNodeConnectionDistanceDeg = 0.2; // ~22km //TODO Play with this value
+		double maxNodeConnectionDistance = 5000; 
 		for(PathBlockingObstacleImpl obstacle : polygonObstacles) {
-			nodeConnector.addObstacle(obstacle, polygonObstacles, maxNodeConnectionDistanceDeg);
+			nodeConnector.addObstacle(obstacle, polygonObstacles, maxNodeConnectionDistance);
 		}
 		
 		Pair<NodeConnector, ArrayList<PathBlockingObstacleImpl>> navPair = Pair.of(nodeConnector, polygonObstacles);

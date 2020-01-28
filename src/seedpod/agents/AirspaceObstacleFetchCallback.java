@@ -8,5 +8,5 @@ import seedpod.agents.airspace.AirspaceAgent;
 public interface AirspaceObstacleFetchCallback {
 
 	public List<AirspaceAgent> fetchAirspaceObstacles();
-	
+		
 }

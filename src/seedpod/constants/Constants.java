@@ -14,6 +14,7 @@ public final class Constants {
 															// 1.0 makes agent move along flightpath bearing prior to conflict
 	
 	public static final double MESH_LAYER_SPACING_M = 152.4; // Vertical spacing between airspace navmesh layers in metres
+	public static final double MESH_COORD_SCALE_FACTOR = 10; // Scale up all coords to avoid issues with polygon buffers being larger than actual geometry
 	
 	/* Set sim area limits */
 	public static final double MAX_LAT = 51.3;
