@@ -11,6 +11,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
+import bsh.This;
 import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
@@ -19,6 +20,7 @@ import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.meta.AirproxMarker;
+import seedpod.agents.meta.RouteEdge;
 import seedpod.agents.meta.RouteMarker;
 import seedpod.agents.navutils.PathFinderFactory;
 import seedpod.agents.navutils.WrappedPathFinder;
@@ -52,7 +54,6 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	/* Simulation-related fields */
 	protected Context context;
 	protected Geography geography;
-	private Network routeNetwork;
 	private RouteMarker previousRouteMarker;
 	private int simTickLife = 0;
 
@@ -64,7 +65,6 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	public void setup() {
 		this.context = ContextUtils.getContext(this);
 		this.geography = (Geography) context.getProjection("airspace_geo");
-		this.routeNetwork = (Network) context.getProjection("routes");
 		this.previousRouteMarker = new RouteMarker(this.currentPosition);
 		this.context.add(this.previousRouteMarker);
 	}
@@ -190,11 +190,12 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	}
 	
 	public void dropRouteMarker() {
+		Network routeNetwork = (Network) this.context.getProjection("routes");
 		RouteMarker marker = new RouteMarker(this.currentPosition);
 		this.context.add(marker);
-		RepastEdge edge = new RepastEdge(this.previousRouteMarker, marker, true);
-		this.routeNetwork.addEdge(edge);
 		this.geography.move(marker, this.geography.getGeometry(this));
+		routeNetwork.addEdge(new RouteEdge(this.previousRouteMarker, marker));
+		this.previousRouteMarker = marker;
 	}
 
 	public abstract List<AirspaceAgent> getAirspaceObstacles();

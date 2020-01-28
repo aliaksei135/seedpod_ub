@@ -16,7 +16,7 @@ import seedpod.constants.EAirspaceClass;
 
 public class UAVAgent extends BaseAircraftAgent {
 
-	private static final double REQ_LATERAL_SEP_M = 1000; // About 0.5nm
+	private static final double REQ_LATERAL_SEP_M = 500; 
 
 	private static final List<EAirspaceClass> PERMISSABLE_AIRSPACE_CLASSES = List.of(EAirspaceClass.CLASS_D,
 			EAirspaceClass.CLASS_E, EAirspaceClass.CLASS_F, EAirspaceClass.CLASS_G);

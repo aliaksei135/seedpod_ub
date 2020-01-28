@@ -61,8 +61,8 @@ public class ContextCreator implements ContextBuilder<Object> {
 		GeographyFactory geographyFactory = GeographyFactoryFinder.createGeographyFactory(null);
 		Geography<Object> airspaceGeography = geographyFactory.createGeography("airspace_geo", context, geoParams);
 		
-		NetworkBuilder networkBuilder = new NetworkBuilder<>("routes", context, true);
-		Network routeNetwork = networkBuilder.buildNetwork();
+		NetworkBuilder<Object> networkBuilder = new NetworkBuilder<Object>("routes", context, true);
+		Network<Object> routeNetwork = networkBuilder.buildNetwork();
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 //		new GISNetworkListener(context, airspaceGeography, routeNetwork);

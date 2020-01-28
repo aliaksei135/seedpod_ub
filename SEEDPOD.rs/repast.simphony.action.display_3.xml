@@ -56,13 +56,13 @@
   <netStyles>
     <entry>
       <string>routes</string>
-      <string>repast.simphony.visualization.gis3D.style.DefaultNetworkStyleGIS</string>
+      <string>repast.simphony.visualization.gis3D.style.EditedNetworkStyleGIS</string>
     </entry>
   </netStyles>
   <editedNetStyles>
     <entry>
       <string>routes</string>
-      <null/>
+      <string>routes.style_3.xml</string>
     </entry>
   </editedNetStyles>
   <frequency>ON_NEW</frequency>
@@ -73,13 +73,13 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>358096249</hashCode>
+    <hashCode>1358133842</hashCode>
   </schedParams>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
       <string>routes</string>
-      <int>1</int>
+      <int>2</int>
     </entry>
     <entry>
       <string>seedpod.agents.manned.MannedAircraftAgent</string>
@@ -91,7 +91,7 @@
     </entry>
     <entry>
       <string>seedpod.agents.airspace.AirspaceAgent</string>
-      <int>2</int>
+      <int>1</int>
     </entry>
     <entry>
       <string>seedpod.agents.meta.AirproxMarker</string>

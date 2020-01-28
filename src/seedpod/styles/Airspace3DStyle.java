@@ -6,6 +6,8 @@ import seedpod.agents.airspace.AirspaceAgent;
 
 import gov.nasa.worldwind.render.SurfaceShape;
 import repast.simphony.visualization.gis3D.style.EditedSurfaceShapeStyle;
+import repast.simphony.visualization.gis3D.style.StyleGIS;
+import repast.simphony.visualization.gis3D.style.SurfaceShapeStyle;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.constants.EAirspaceClass;
 
@@ -26,5 +28,7 @@ public class Airspace3DStyle extends EditedSurfaceShapeStyle {
 		EAirspaceClass airspaceClass = ((AirspaceAgent)obj).getAirspaceClass();
 		return AIRSPACE_COLOUR_MAP.get(airspaceClass);
 	}
+	
+	
 
 }
