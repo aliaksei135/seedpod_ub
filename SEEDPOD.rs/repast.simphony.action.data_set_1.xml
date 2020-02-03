@@ -5,22 +5,36 @@
   <inclBatchRun>false</inclBatchRun>
   <inclRandomSeed>false</inclRandomSeed>
   <scheduleParams>
-    <start>0.0</start>
-    <interval>1.0</interval>
+    <start>1.0</start>
+    <interval>3.0</interval>
     <priority>-Infinity</priority>
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>2070222849</hashCode>
+    <hashCode>-2102044824</hashCode>
   </scheduleParams>
   <atEnd>true</atEnd>
   <methodDataSources class="linked-hash-map"/>
   <countSources class="linked-hash-map">
     <entry>
-      <string>Airprox</string>
+      <string>UAV-UAV</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
-        <typeName>seedpod.agents.meta.AirproxMarker</typeName>
-        <id>Airprox</id>
+        <typeName>seedpod.agents.meta.UAVUAVAirproxMarker</typeName>
+        <id>UAV-UAV</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Manned-Manned</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>seedpod.agents.meta.MannedMannedAirproxMarker</typeName>
+        <id>Manned-Manned</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>UAV-Manned</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>seedpod.agents.meta.MannedUAVAirproxMarker</typeName>
+        <id>UAV-Manned</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
   </countSources>

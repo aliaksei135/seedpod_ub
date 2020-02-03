@@ -98,7 +98,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 			uavAdder.add(airspaceGeography, agent);
 		}
 		
-		RunEnvironment.getInstance().endAt(40000);
+		RunEnvironment.getInstance().endAt(4000);
 
 		return context;
 	}

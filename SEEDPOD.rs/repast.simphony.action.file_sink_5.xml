@@ -1,11 +1,13 @@
 <repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.7.0">
-  <name>Airproxes File Sink</name>
+  <name>Airprox File Sink</name>
   <dataSet>Airproxes</dataSet>
   <delimiter>,</delimiter>
   <format>TABULAR</format>
   <sourceIds class="linked-hash-set">
-    <string>Airprox</string>
     <string>tick</string>
+    <string>UAV-UAV</string>
+    <string>Manned-Manned</string>
+    <string>UAV-Manned</string>
   </sourceIds>
   <fileName>airproxes.csv</fileName>
   <addTimeStamp>true</addTimeStamp>

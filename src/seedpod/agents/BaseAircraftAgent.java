@@ -21,10 +21,14 @@ import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
 import seedpod.agents.meta.AirproxMarker;
+import seedpod.agents.meta.MannedMannedAirproxMarker;
+import seedpod.agents.meta.MannedUAVAirproxMarker;
 import seedpod.agents.meta.RouteEdge;
 import seedpod.agents.meta.RouteMarker;
+import seedpod.agents.meta.UAVUAVAirproxMarker;
 import seedpod.agents.navutils.PathFinderFactory;
 import seedpod.agents.navutils.WrappedPathFinder;
+import seedpod.agents.unmanned.UAVAgent;
 import straightedge.geom.KPoint;
 import straightedge.geom.path.PathBlockingObstacleImpl;
 import straightedge.geom.path.PathData;
@@ -170,7 +174,7 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	public void performAvoidanceActions(BaseAircraftAgent conflictingAgent) {
 		this.onPath = false;
 		this.inTCAS = true;
-		dropAirproxMarker();
+		dropAirproxMarker(conflictingAgent.getClass());
 		Coordinate conflicterCoordinate = conflictingAgent.currentPosition;
 		double dy = conflicterCoordinate.y - this.currentPosition.y;
 		double dx = Math.cos(Math.PI / 180 * this.currentPosition.y)
@@ -183,11 +187,29 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 		this.geography.moveByVector(this, this.lateralMaxSpeedMPS * SIM_TICK_SECS, avoidanceAngleRad);
 	}
 
-	public void dropAirproxMarker() {
-		AirproxMarker marker = new AirproxMarker(this.currentPosition);
-		this.context.add(marker);
-		Geometry currentPos = this.geography.getGeometry(this);
-		this.geography.move(marker, currentPos);
+	public void dropAirproxMarker(Class<? extends BaseAircraftAgent> conflictingAgentType) {
+		// This gets very hacky and verbose due to how how Repast handles agent types
+		if(this.getClass().equals(conflictingAgentType)) {
+			if(this.getClass().equals(UAVAgent.class)) {
+				UAVUAVAirproxMarker marker = new UAVUAVAirproxMarker(this.currentPosition);
+				marker.elevation = this.currentAltitude;
+				this.context.add(marker);
+				Geometry currentPos = this.geography.getGeometry(this);
+				this.geography.move(marker, currentPos);
+			} else {
+				MannedMannedAirproxMarker marker = new MannedMannedAirproxMarker(this.currentPosition);
+				marker.elevation = this.currentAltitude;
+				this.context.add(marker);
+				Geometry currentPos = this.geography.getGeometry(this);
+				this.geography.move(marker, currentPos);
+			}
+		} else {
+			MannedUAVAirproxMarker marker = new MannedUAVAirproxMarker(this.currentPosition);
+			marker.elevation = this.currentAltitude;
+			this.context.add(marker);
+			Geometry currentPos = this.geography.getGeometry(this);
+			this.geography.move(marker, currentPos);
+		}
 	}
 	
 	public void dropRouteMarker() {

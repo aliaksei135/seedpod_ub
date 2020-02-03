@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public abstract class BaseMarker{
 
-	Coordinate coordinate;
+	public Coordinate coordinate;
 
 	public BaseMarker(Coordinate coordinate) {
 		super();
