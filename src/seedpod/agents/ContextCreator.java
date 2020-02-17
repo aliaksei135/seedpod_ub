@@ -27,14 +27,13 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
-import gov.nasa.worldwind.render.ShapeAttributes;
-import gov.nasa.worldwind.render.airspaces.AirspaceAttributes;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactory;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.random.RandomHelper;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
 import repast.simphony.space.graph.Network;
@@ -74,7 +73,7 @@ public class ContextCreator implements ContextBuilder<Object> {
 				AerodromeAgent.class);
 		List<BaseGroundAgent> hospitals = loadGroundFeatures(HOSPITAL_SHAPEFILE, context, airspaceGeography,
 				HospitalAgent.class);
-		List<AirspaceAgent> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
+//		List<AirspaceAgent> airspace = loadAirspaceFeatures(AIRSPACE_SHAPEFILE, context, airspaceGeography);
 
 		// Add entry/exit NavFixes
 		for(DepartureArrivalFixes nf : NavFixes.DepartureArrivalFixes.values()) {
@@ -98,8 +97,9 @@ public class ContextCreator implements ContextBuilder<Object> {
 			uavAdder.add(airspaceGeography, agent);
 		}
 		
-		RunEnvironment.getInstance().endAt(4000);
-
+		RunEnvironment.getInstance().endAt(5000);
+		RandomHelper.setSeed(RunEnvironment.getInstance().getParameters().getInteger("randomSeed"));
+		
 		return context;
 	}
 

@@ -1,6 +1,7 @@
 package seedpod.agents.unmanned;
 
 import java.util.List;
+import java.util.Random;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -8,6 +9,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.parameter.Parameters;
 import repast.simphony.random.RandomHelper;
+import repast.simphony.random.RandomRegistry;
 import repast.simphony.space.gis.Geography;
 import seedpod.agents.BaseGISAdder;
 import seedpod.agents.ground.BaseGroundAgent;
@@ -29,11 +31,14 @@ public class UAVAdder extends BaseGISAdder {
 	@Override
 	public void add(Geography<Object> projection, Object object) {
 		super.add(projection, object);
-
-		int originIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
-		int destinationIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
+		
+//		int originIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
+		int originIndex = new Random().nextInt(this.groundAgents.size());
+//		int destinationIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
+		int destinationIndex = new Random().nextInt(this.groundAgents.size());
 		while (originIndex == destinationIndex) {
-			destinationIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
+//			destinationIndex = RandomHelper.nextIntFromTo(0, this.groundAgents.size() - 1);
+			destinationIndex = new Random().nextInt(this.groundAgents.size());
 		}
 
 		Geometry originGeometry = this.groundAgents.get(originIndex).geometry;

@@ -11,27 +11,20 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
-import bsh.This;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.graph.Network;
-import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.util.ContextUtils;
 import seedpod.agents.airspace.AirspaceAgent;
-import seedpod.agents.meta.AirproxMarker;
 import seedpod.agents.meta.MannedMannedAirproxMarker;
 import seedpod.agents.meta.MannedUAVAirproxMarker;
 import seedpod.agents.meta.RouteEdge;
 import seedpod.agents.meta.RouteMarker;
 import seedpod.agents.meta.UAVUAVAirproxMarker;
-import seedpod.agents.navutils.PathFinderFactory;
-import seedpod.agents.navutils.WrappedPathFinder;
 import seedpod.agents.unmanned.UAVAgent;
-import straightedge.geom.KPoint;
-import straightedge.geom.path.PathBlockingObstacleImpl;
-import straightedge.geom.path.PathData;
+
 
 public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback{
 
@@ -85,9 +78,9 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 
 		this.currentPosition = this.geography.getGeometry(this).getCoordinate();
 		
-		if(this.simTickLife % 5 == 0) {
-			dropRouteMarker();
-		}
+//		if(this.simTickLife % 5 == 0) {
+//			dropRouteMarker();
+//		}
 
 		// Replan path if not on it
 		if (!onPath)
@@ -232,23 +225,27 @@ public abstract class BaseAircraftAgent implements AirspaceObstacleFetchCallback
 	public void findPath() {
 		this.pathCoords.clear();
 
-		WrappedPathFinder pathFinder = PathFinderFactory.getInstance().getPathFinder(this.targetAltitude, this);
-		KPoint startPoint = new KPoint(this.currentPosition.x, this.currentPosition.y);
-		KPoint endPoint = new KPoint(this.destination.x, this.destination.y);
-		PathData pathData = pathFinder.calc(startPoint, endPoint);
-
-		for(KPoint point : pathData.getPoints()) {
-			this.pathCoords.add(new Coordinate(point.x, point.y));
-		}
-
 		this.pathIndex = 0;
-		if(this.pathCoords.size() <= 2) {
-			this.pathCoords.clear();
-			this.pathCoords.add(this.destination);
-			this.nextPointDestination = true;
-		} else {
-			this.pathCoords.remove(0); //Remove current position
-		}
+		this.pathCoords.add(this.destination);
+		this.nextPointDestination = true;
+		
+//		WrappedPathFinder pathFinder = PathFinderFactory.getInstance().getPathFinder(this.targetAltitude, this);
+//		KPoint startPoint = new KPoint(this.currentPosition.x, this.currentPosition.y);
+//		KPoint endPoint = new KPoint(this.destination.x, this.destination.y);
+//		PathData pathData = pathFinder.calc(startPoint, endPoint);
+//
+//		for(KPoint point : pathData.getPoints()) {
+//			this.pathCoords.add(new Coordinate(point.x, point.y));
+//		}
+//
+//		this.pathIndex = 0;
+//		if(this.pathCoords.size() <= 2) {
+//			this.pathCoords.clear();
+//			this.pathCoords.add(this.destination);
+//			this.nextPointDestination = true;
+//		} else {
+//			this.pathCoords.remove(0); //Remove current position
+//		}
 
 	}
 
